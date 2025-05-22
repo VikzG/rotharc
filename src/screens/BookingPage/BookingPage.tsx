@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 
 export const BookingPage = () => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -92,14 +92,6 @@ export const BookingPage = () => {
       }
     });
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#d9d9d9] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#2C8DB0] animate-spin" />
-      </div>
-    );
-  }
 
   if (!user) {
     return (
