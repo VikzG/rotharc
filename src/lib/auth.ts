@@ -93,6 +93,23 @@ export const signOut = async () => {
   }
 };
 
+export const deleteAccount = async () => {
+  try {
+    const { error } = await supabase.auth.admin.deleteUser(
+      (await supabase.auth.getUser()).data.user?.id || ''
+    );
+    
+    if (error) throw error;
+    
+    toast.success('Votre compte a été supprimé avec succès.');
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    toast.error('Erreur lors de la suppression du compte.');
+    return { success: false, error };
+  }
+};
+
 export const getCurrentUser = async () => {
   try {
     const { data: { user }, error } = await supabase.auth.getUser();

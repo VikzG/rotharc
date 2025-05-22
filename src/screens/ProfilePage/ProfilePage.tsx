@@ -4,14 +4,18 @@ import { Navigation } from '../../components/Navigation';
 import { Footer } from '../../components/Footer';
 import { Button } from '../../components/ui/button';
 import { useAuth } from '../../contexts/AuthContext';
-import { UserCircle, Mail, Phone, MapPin, Building } from 'lucide-react';
+import { UserCircle, Mail, Phone, MapPin, Building, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'react-hot-toast';
+import { deleteAccount } from '../../lib/auth';
+import { useNavigate } from 'react-router-dom';
 
 export const ProfilePage = () => {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -60,6 +64,13 @@ export const ProfilePage = () => {
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Erreur lors de la mise à jour du profil');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const result = await deleteAccount();
+    if (result.success) {
+      navigate('/');
     }
   };
 
@@ -210,35 +221,74 @@ export const ProfilePage = () => {
               </div>
             </div>
 
-            <div className="flex justify-end gap-4 pt-6">
-              {isEditing ? (
-                <>
+            <div className="flex justify-between items-center pt-6">
+              <Button
+                type="button"
+                onClick={() => setShowDeleteConfirmation(true)}
+                className="px-6 bg-red-500 text-white hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica] flex items-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Supprimer mon compte
+              </Button>
+
+              <div className="flex gap-4">
+                {isEditing ? (
+                  <>
+                    <Button
+                      type="button"
+                      onClick={() => setIsEditing(false)}
+                      className="px-6 bg-[#d9d9d9] text-[#2C3E50] shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica]"
+                    >
+                      Annuler
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="px-6 bg-[#2C8DB0] text-white hover:bg-[#2C8DB0]/90 shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica]"
+                    >
+                      Enregistrer
+                    </Button>
+                  </>
+                ) : (
                   <Button
                     type="button"
-                    onClick={() => setIsEditing(false)}
-                    className="px-6 bg-[#d9d9d9] text-[#2C3E50] shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica]"
-                  >
-                    Annuler
-                  </Button>
-                  <Button
-                    type="submit"
+                    onClick={() => setIsEditing(true)}
                     className="px-6 bg-[#2C8DB0] text-white hover:bg-[#2C8DB0]/90 shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica]"
                   >
-                    Enregistrer
+                    Modifier
                   </Button>
-                </>
-              ) : (
-                <Button
-                  type="button"
-                  onClick={() => setIsEditing(true)}
-                  className="px-6 bg-[#2C8DB0] text-white hover:bg-[#2C8DB0]/90 shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica]"
-                >
-                  Modifier
-                </Button>
-              )}
+                )}
+              </div>
             </div>
           </form>
         </div>
+
+        {/* Delete Account Confirmation Modal */}
+        {showDeleteConfirmation && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-[#d9d9d9] rounded-[25px] p-8 max-w-md w-full mx-4 shadow-[15px_15px_38px_#989898e6,-15px_-15px_30px_#ffffffe6]">
+              <h3 className="text-xl font-semibold mb-4 text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
+                Confirmer la suppression
+              </h3>
+              <p className="text-[#443f3f] mb-6 [font-family:'Montserrat_Alternates',Helvetica]">
+                Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.
+              </p>
+              <div className="flex justify-end gap-4">
+                <Button
+                  onClick={() => setShowDeleteConfirmation(false)}
+                  className="px-6 bg-[#d9d9d9] text-[#2C3E50] shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica]"
+                >
+                  Annuler
+                </Button>
+                <Button
+                  onClick={handleDeleteAccount}
+                  className="px-6 bg-red-500 text-white hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica]"
+                >
+                  Supprimer
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />
