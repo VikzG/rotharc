@@ -13,21 +13,21 @@ export const ProfilePage = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: profile?.first_name || '',
-    lastName: profile?.last_name || '',
-    email: user?.email || '',
-    phone: profile?.phone || '',
-    address: profile?.address || '',
-    city: profile?.city || '',
-    postalCode: profile?.postal_code || '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    postalCode: '',
   });
 
   useEffect(() => {
-    if (profile) {
+    if (profile && user) {
       setFormData({
         firstName: profile.first_name || '',
         lastName: profile.last_name || '',
-        email: user?.email || '',
+        email: user.email || '',
         phone: profile.phone || '',
         address: profile.address || '',
         city: profile.city || '',
