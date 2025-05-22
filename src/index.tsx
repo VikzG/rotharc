@@ -9,6 +9,8 @@ import { RegisterPage } from "./screens/RegisterPage";
 import { ContactPage } from "./screens/ContactPage";
 import { NotFoundPage } from "./screens/NotFoundPage";
 import { BookingPage } from "./screens/BookingPage";
+import { ProfilePage } from "./screens/ProfilePage";
+import { ReservationsPage } from "./screens/ReservationsPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
 
@@ -40,6 +42,14 @@ const router = createBrowserRouter([
   {
     path: "/reservation",
     element: <BookingPage />,
+  },
+  {
+    path: "/profile",
+    element: <ProfilePage />,
+  },
+  {
+    path: "/mes-reservations",
+    element: <ReservationsPage />,
   },
   {
     path: "*",
