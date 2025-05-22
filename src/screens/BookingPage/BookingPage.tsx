@@ -103,7 +103,7 @@ export const BookingPage = () => {
           <p className="text-[#443f3f] mb-8 [font-family:'Montserrat_Alternates',Helvetica]">
             Pour accéder à la réservation, veuillez vous connecter ou créer un compte.
           </p>
-          <div className="space-y-4">
+          <div className="space-y-6">
             <Link to="/login">
               <Button className="w-full bg-[#2C8DB0] text-white hover:bg-[#2C8DB0]/90 shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica]">
                 Se connecter
