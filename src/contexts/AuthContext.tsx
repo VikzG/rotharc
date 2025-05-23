@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     async function initAuth() {
       try {
-        // Récupérer la session depuis Supabase
+        setLoading(true);
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -34,7 +34,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (mounted) {
             setUser(null);
             setProfile(null);
-            setLoading(false);
           }
           return;
         }
@@ -43,12 +42,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (mounted) {
             setUser(null);
             setProfile(null);
-            setLoading(false);
           }
           return;
         }
 
-        // Récupérer les données de l'utilisateur et son profil
         const data = await getCurrentUser();
         
         if (!mounted) return;
@@ -75,10 +72,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     initAuth();
 
-    // Écouter les changements d'état d'authentification
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
 
+      setLoading(true);
+      
       if (session) {
         try {
           const data = await getCurrentUser();
