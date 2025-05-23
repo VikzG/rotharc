@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
-import { UserIcon, KeyIcon, HomeIcon } from 'lucide-react';
+import { UserIcon, KeyIcon, HomeIcon, Loader2 } from 'lucide-react';
 import { signIn } from '../../lib/auth';
 import { z } from 'zod';
 
@@ -42,19 +42,25 @@ export const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
     
     setIsLoading(true);
     
-    const result = await signIn({
-      email: formData.email,
-      password: formData.password,
-    });
+    try {
+      const result = await signIn({
+        email: formData.email,
+        password: formData.password,
+      });
 
-    setIsLoading(false);
-
-    if (result.success) {
-      navigate('/');
+      if (result.success) {
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -130,6 +136,7 @@ export const LoginPage = () => {
                     errors.email ? 'ring-2 ring-red-500' : ''
                   }`}
                   placeholder="votreemail@exemple.fr"
+                  disabled={isLoading}
                 />
                 {errors.email && (
                   <p className="text-red-500 text-xs mt-1">{errors.email}</p>
@@ -154,6 +161,7 @@ export const LoginPage = () => {
                     errors.password ? 'ring-2 ring-red-500' : ''
                   }`}
                   placeholder="••••••••"
+                  disabled={isLoading}
                 />
                 {errors.password && (
                   <p className="text-red-500 text-xs mt-1">{errors.password}</p>
@@ -168,6 +176,7 @@ export const LoginPage = () => {
                 id="remember-me"
                 type="checkbox"
                 className="h-4 w-4 rounded border-[#2C3E50] text-[#2C8DB0] focus:ring-[#2C8DB0]"
+                disabled={isLoading}
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
                 Se souvenir de moi
@@ -184,9 +193,16 @@ export const LoginPage = () => {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-12 text-lg bg-[#2C8DB0] text-white hover:bg-[#2C8DB0]/90 shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-12 text-lg bg-[#2C8DB0] text-white hover:bg-[#2C8DB0]/90 shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {isLoading ? 'Connexion...' : 'Se connecter'}
+            {isLoading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Connexion...
+              </>
+            ) : (
+              'Se connecter'
+            )}
           </Button>
 
           <p className="text-center text-sm text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
