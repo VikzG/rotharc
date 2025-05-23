@@ -34,8 +34,6 @@ export const signUp = async ({ email, password, firstName, lastName }: SignUpDat
       throw new Error('No user data returned');
     }
 
-    console.log('Creating profile for user:', authData.user.id);
-    
     const { error: profileError } = await supabase
       .from('profiles')
       .insert([
@@ -53,7 +51,7 @@ export const signUp = async ({ email, password, firstName, lastName }: SignUpDat
       throw profileError;
     }
 
-    console.log('Profile created successfully');
+    await supabase.auth.signOut();
     toast.success('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
     return { success: true };
 
@@ -73,7 +71,6 @@ export const signUp = async ({ email, password, firstName, lastName }: SignUpDat
 };
 
 export const signIn = async ({ email, password }: SignInData) => {
-  console.log('Starting signIn process...');
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -81,12 +78,10 @@ export const signIn = async ({ email, password }: SignInData) => {
     });
 
     if (error) {
-      console.error('SignIn error:', error);
       throw error;
     }
 
     if (!data.user) {
-      console.error('No user data returned from signIn');
       throw new Error('No user data returned');
     }
 
@@ -97,9 +92,7 @@ export const signIn = async ({ email, password }: SignInData) => {
       .single();
 
     if (profileError) {
-      console.error('Profile fetch error:', profileError);
       if (profileError.code === 'PGRST116') {
-        console.log('Profile not found, creating new profile...');
         const { data: newProfile, error: createError } = await supabase
           .from('profiles')
           .insert([
@@ -115,14 +108,13 @@ export const signIn = async ({ email, password }: SignInData) => {
           .single();
 
         if (createError) {
-          console.error('Error creating profile during signin:', createError);
           throw createError;
         }
 
-        profile = newProfile;
-      } else {
-        throw profileError;
+        toast.success('Connexion réussie !');
+        return { success: true, user: data.user, profile: newProfile };
       }
+      throw profileError;
     }
 
     toast.success('Connexion réussie !');
@@ -173,21 +165,17 @@ export const deleteAccount = async () => {
 };
 
 export const getCurrentUser = async () => {
-  console.log('Fetching current user...');
   try {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
     if (userError) {
-      console.error('Error fetching user:', userError);
-      return null;
+      throw userError;
     }
 
     if (!user) {
-      console.log('No user found');
       return null;
     }
 
-    console.log('Fetching user profile...', user.id);
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
@@ -196,7 +184,6 @@ export const getCurrentUser = async () => {
 
     if (profileError) {
       if (profileError.code === 'PGRST116') {
-        console.log('Profile not found, creating new profile...');
         const { data: newProfile, error: createError } = await supabase
           .from('profiles')
           .insert([
@@ -212,15 +199,12 @@ export const getCurrentUser = async () => {
           .single();
 
         if (createError) {
-          console.error('Error creating profile:', createError);
-          return { user, profile: null };
+          throw createError;
         }
 
         return { user, profile: newProfile };
       }
-      
-      console.error('Error fetching profile:', profileError);
-      return { user, profile: null };
+      throw profileError;
     }
 
     return { user, profile };
