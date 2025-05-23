@@ -34,6 +34,8 @@ export const signUp = async ({ email, password, firstName, lastName }: SignUpDat
       throw new Error('No user data returned');
     }
 
+    console.log('Creating profile for user:', authData.user.id);
+    
     // Create profile after successful signup
     const { error: profileError } = await supabase
       .from('profiles')
@@ -52,6 +54,7 @@ export const signUp = async ({ email, password, firstName, lastName }: SignUpDat
       throw profileError;
     }
 
+    console.log('Profile created successfully');
     toast.success('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
     return { success: true };
 
@@ -81,12 +84,12 @@ export const signIn = async ({ email, password }: SignInData) => {
 
     if (error) {
       console.error('SignIn error:', error);
-      return { success: false, error };
+      throw error;
     }
 
     if (!data.user) {
       console.error('No user data returned from signIn');
-      return { success: false, error: new Error('No user data returned') };
+      throw new Error('No user data returned');
     }
 
     console.log('Fetching profile data...');
@@ -100,7 +103,31 @@ export const signIn = async ({ email, password }: SignInData) => {
 
     if (profileError) {
       console.error('Profile fetch error:', profileError);
-      return { success: false, error: profileError };
+      if (profileError.code === 'PGRST116') {
+        console.log('Profile not found, creating new profile...');
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: data.user.id,
+              first_name: data.user.user_metadata?.first_name || '',
+              last_name: data.user.user_metadata?.last_name || '',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            }
+          ])
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Error creating profile during signin:', createError);
+          throw createError;
+        }
+
+        profile = newProfile;
+      } else {
+        throw profileError;
+      }
     }
 
     toast.success('Connexion réussie !');
@@ -176,6 +203,30 @@ export const getCurrentUser = async () => {
     console.log('Profile fetch response:', { profile, profileError });
 
     if (profileError) {
+      if (profileError.code === 'PGRST116') {
+        console.log('Profile not found, creating new profile...');
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: user.id,
+              first_name: user.user_metadata?.first_name || '',
+              last_name: user.user_metadata?.last_name || '',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            }
+          ])
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Error creating profile:', createError);
+          return { user, profile: null };
+        }
+
+        return { user, profile: newProfile };
+      }
+      
       console.error('Error fetching profile:', profileError);
       return { user, profile: null };
     }
