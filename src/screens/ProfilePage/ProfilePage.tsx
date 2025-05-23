@@ -11,7 +11,7 @@ import { deleteAccount } from '../../lib/auth';
 import { useNavigate } from 'react-router-dom';
 
 export const ProfilePage = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, setUser } = useAuth();
   const navigate = useNavigate();
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -119,7 +119,25 @@ export const ProfilePage = () => {
         throw new Error('Erreur lors de la mise à jour du profil');
       }
 
+      // Update local state immediately
       setFormData(prev => ({ ...prev, avatarUrl: publicUrl }));
+
+      // Fetch updated profile to ensure all components are in sync
+      const { data: updatedProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .single();
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      // Update the global auth context
+      if (user) {
+        setUser({ ...user, user_metadata: { ...user.user_metadata, avatar_url: publicUrl } });
+      }
+
       toast.success('Avatar mis à jour avec succès !');
     } catch (error) {
       console.error('Error handling avatar:', error);
