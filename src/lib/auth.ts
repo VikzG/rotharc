@@ -15,7 +15,6 @@ export interface SignInData {
 
 export const signUp = async ({ email, password, firstName, lastName }: SignUpData) => {
   try {
-    // First, create the auth user
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
@@ -41,7 +40,6 @@ export const signUp = async ({ email, password, firstName, lastName }: SignUpDat
   } catch (error: any) {
     console.error('Error signing up:', error);
     
-    // Handle specific error cases
     if (error.message?.includes('User already registered')) {
       toast.error('Un compte existe déjà avec cet email');
     } else if (error.message?.includes('Password should be')) {
@@ -61,21 +59,27 @@ export const signIn = async ({ email, password }: SignInData) => {
       password,
     });
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
+
+    if (!data.user) {
+      throw new Error('No user data returned');
+    }
 
     toast.success('Connexion réussie !');
     return { success: true, user: data.user };
+
   } catch (error: any) {
     console.error('Error signing in:', error);
     
-    // Handle specific error cases
     if (error.message?.includes('Invalid login credentials')) {
       toast.error('Email ou mot de passe incorrect');
     } else {
       toast.error('Erreur de connexion. Veuillez réessayer.');
     }
     
-    return { success: false, error };
+    throw error; // Propagate the error to handle loading state in component
   }
 };
 
