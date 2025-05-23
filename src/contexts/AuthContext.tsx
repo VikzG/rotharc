@@ -22,38 +22,48 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('AuthProvider mounted');
     let mounted = true;
 
     async function initAuth() {
-      console.log('Initializing auth...');
       try {
-        const data = await getCurrentUser();
-        console.log('InitAuth response:', data);
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (!mounted) {
-          console.log('Component unmounted, skipping state update');
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          if (mounted) {
+            setUser(null);
+            setProfile(null);
+            setLoading(false);
+          }
           return;
         }
 
+        if (!session) {
+          if (mounted) {
+            setUser(null);
+            setProfile(null);
+            setLoading(false);
+          }
+          return;
+        }
+
+        const data = await getCurrentUser();
+        
+        if (!mounted) return;
+
         if (data) {
-          console.log('Setting user and profile data');
           setUser(data.user);
           setProfile(data.profile);
         } else {
-          console.log('No user data, clearing state');
           setUser(null);
           setProfile(null);
         }
+        setLoading(false);
       } catch (error) {
         console.error('Error in initAuth:', error);
         if (mounted) {
           setUser(null);
           setProfile(null);
-        }
-      } finally {
-        if (mounted) {
-          console.log('Setting loading to false');
           setLoading(false);
         }
       }
@@ -63,35 +73,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session);
-      if (!mounted) {
-        console.log('Component unmounted, skipping auth state change');
-        return;
-      }
+      
+      if (!mounted) return;
 
       if (session) {
-        console.log('Session exists, fetching user data');
-        const data = await getCurrentUser();
-        if (mounted) {
-          console.log('Setting user data from auth change');
+        try {
+          const data = await getCurrentUser();
+          if (!mounted) return;
+          
           setUser(data?.user || null);
           setProfile(data?.profile || null);
-        }
-      } else {
-        console.log('No session, clearing user data');
-        if (mounted) {
+        } catch (error) {
+          console.error('Error updating auth state:', error);
           setUser(null);
           setProfile(null);
         }
+      } else {
+        setUser(null);
+        setProfile(null);
       }
       
-      if (mounted) {
-        console.log('Setting loading to false after auth change');
-        setLoading(false);
-      }
+      setLoading(false);
     });
 
     return () => {
-      console.log('AuthProvider unmounting');
       mounted = false;
       listener.subscription.unsubscribe();
     };
