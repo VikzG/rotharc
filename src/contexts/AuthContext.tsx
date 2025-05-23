@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     async function initAuth() {
       try {
         setLoading(true);
+
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -76,14 +77,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!mounted) return;
 
       setLoading(true);
-      
+
       if (session) {
         try {
           const data = await getCurrentUser();
           if (!mounted) return;
           
-          setUser(data?.user || null);
-          setProfile(data?.profile || null);
+          if (data) {
+            setUser(data.user);
+            setProfile(data.profile);
+          } else {
+            setUser(null);
+            setProfile(null);
+          }
         } catch (error) {
           console.error('Error updating auth state:', error);
           setUser(null);
