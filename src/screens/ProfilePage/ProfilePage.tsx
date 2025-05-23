@@ -88,11 +88,11 @@ export const ProfilePage = () => {
       const filePath = `${user?.id}/${fileName}`;
 
       // Upload du fichier
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: true
+          upsert: false
         });
 
       if (uploadError) {
