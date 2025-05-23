@@ -73,7 +73,7 @@ export const ProfilePage = () => {
   const handleDeleteAccount = async () => {
     const result = await deleteAccount();
     if (result.success) {
-      navigate('/');
+      navigate('/', { replace: true });
     }
   };
 
