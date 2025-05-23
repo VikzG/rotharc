@@ -82,23 +82,6 @@ export const ProfilePage = () => {
     if (!file) return;
 
     try {
-      // Vérifier si le bucket existe, sinon le créer
-      const { data: buckets } = await supabase.storage.listBuckets();
-      const avatarBucket = buckets?.find(b => b.name === 'avatars');
-      
-      if (!avatarBucket) {
-        const { error: bucketError } = await supabase.storage.createBucket('avatars', {
-          public: true,
-          fileSizeLimit: 1024 * 1024, // 1MB
-          allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif']
-        });
-        
-        if (bucketError) {
-          console.error('Error creating bucket:', bucketError);
-          throw new Error('Erreur lors de la création du bucket de stockage');
-        }
-      }
-
       // Générer un nom de fichier unique
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
