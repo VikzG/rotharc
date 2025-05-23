@@ -34,6 +34,16 @@ export const signUp = async ({ email, password, firstName, lastName }: SignUpDat
       throw new Error('No user data returned');
     }
 
+    // Sign in immediately after signup to create the profile
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      throw signInError;
+    }
+
     const { error: profileError } = await supabase
       .from('profiles')
       .insert([
@@ -51,6 +61,7 @@ export const signUp = async ({ email, password, firstName, lastName }: SignUpDat
       throw profileError;
     }
 
+    // Sign out after profile creation
     await supabase.auth.signOut();
     toast.success('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
     return { success: true };
@@ -135,21 +146,17 @@ export const signIn = async ({ email, password }: SignInData) => {
 
 export const signOut = async () => {
   try {
-    // Récupérer la session actuelle
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
       return { success: true };
     }
 
-    // Supprimer explicitement le token JWT du localStorage
     localStorage.removeItem('supabase.auth.token');
     
-    // Déconnexion de Supabase
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
 
-    // Vérifier que la déconnexion a bien eu lieu et que le token est supprimé
     const { data: { session: checkSession } } = await supabase.auth.getSession();
     if (checkSession || localStorage.getItem('supabase.auth.token')) {
       throw new Error('La déconnexion a échoué');
