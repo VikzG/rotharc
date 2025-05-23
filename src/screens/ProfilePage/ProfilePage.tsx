@@ -4,7 +4,7 @@ import { Navigation } from '../../components/Navigation';
 import { Footer } from '../../components/Footer';
 import { Button } from '../../components/ui/button';
 import { useAuth } from '../../contexts/AuthContext';
-import { UserCircle, Mail, Phone, MapPin, Building, Trash2 } from 'lucide-react';
+import { UserCircle, Mail, Phone, MapPin, Building, Trash2, Camera } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'react-hot-toast';
 import { deleteAccount } from '../../lib/auth';
@@ -24,6 +24,7 @@ export const ProfilePage = () => {
     address: '',
     city: '',
     postalCode: '',
+    avatarUrl: '',
   });
 
   useEffect(() => {
@@ -36,6 +37,7 @@ export const ProfilePage = () => {
         address: profile.address || '',
         city: profile.city || '',
         postalCode: profile.postal_code || '',
+        avatarUrl: profile.avatar_url || '',
       });
     }
   }, [profile, user]);
@@ -53,6 +55,7 @@ export const ProfilePage = () => {
           address: formData.address,
           city: formData.city,
           postal_code: formData.postalCode,
+          avatar_url: formData.avatarUrl,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user?.id);
@@ -74,6 +77,41 @@ export const ProfilePage = () => {
     }
   };
 
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${user?.id}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, avatarUrl: publicUrl });
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user?.id);
+
+      if (updateError) throw updateError;
+
+      toast.success('Avatar mis à jour avec succès !');
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error('Erreur lors du téléchargement de l\'avatar');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#d9d9d9]">
       <Navigation isNavVisible={isNavVisible} toggleNav={() => setIsNavVisible(!isNavVisible)} />
@@ -84,12 +122,38 @@ export const ProfilePage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-4xl font-semibold mb-4 text-center [font-family:'Montserrat_Alternates',Helvetica]">
-            Mon Profil
-          </h1>
-          <p className="text-lg text-center text-[#443f3f] mb-12 [font-family:'Montserrat_Alternates',Helvetica]">
-            Gérez vos informations personnelles
-          </p>
+          <div className="flex flex-col items-center mb-8">
+            <div className="relative">
+              <div className="w-32 h-32 rounded-full overflow-hidden bg-[#d9d9d9] shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6]">
+                {formData.avatarUrl ? (
+                  <img
+                    src={formData.avatarUrl}
+                    alt="Avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <UserCircle className="w-20 h-20 text-[#2C3E50]" />
+                  </div>
+                )}
+              </div>
+              <label className="absolute bottom-0 right-0 w-10 h-10 bg-[#2C8DB0] rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-[#2C8DB0]/90 transition-colors">
+                <Camera className="w-5 h-5 text-white" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
+              </label>
+            </div>
+            <h1 className="text-4xl font-semibold mt-4 mb-2 [font-family:'Montserrat_Alternates',Helvetica]">
+              Mon Profil
+            </h1>
+            <p className="text-lg text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
+              Gérez vos informations personnelles
+            </p>
+          </div>
         </motion.div>
 
         <div className="bg-[#d9d9d9] rounded-[25px] p-8 shadow-[15px_15px_38px_#989898e6,-15px_-15px_30px_#ffffffe6]">

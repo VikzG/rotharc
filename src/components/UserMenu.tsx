@@ -24,9 +24,20 @@ export const UserMenu = ({ onClose }: UserMenuProps) => {
       className="absolute right-0 top-full mt-2 w-48 rounded-lg bg-[#d9d9d9] shadow-lg py-2"
     >
       <div className="px-4 py-2 border-b border-[#2C3E50]/10">
-        <p className="text-sm font-medium text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
-          {profile?.first_name} {profile?.last_name}
-        </p>
+        <div className="flex items-center gap-2">
+          {profile?.avatar_url ? (
+            <img 
+              src={profile.avatar_url} 
+              alt="Avatar" 
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          ) : (
+            <UserIcon className="w-8 h-8 text-[#2C3E50]" />
+          )}
+          <p className="text-sm font-medium text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
+            {profile?.first_name} {profile?.last_name}
+          </p>
+        </div>
       </div>
       
       <div className="py-1">
