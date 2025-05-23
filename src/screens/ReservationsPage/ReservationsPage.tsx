@@ -4,7 +4,7 @@ import { Navigation } from '../../components/Navigation';
 import { Footer } from '../../components/Footer';
 import { Button } from '../../components/ui/button';
 import { useAuth } from '../../contexts/AuthContext';
-import { Calendar, Clock, MapPin } from 'lucide-react';
+import { Calendar, Clock, MapPin, Mail, Phone, FileText } from 'lucide-react';
 import { getUserBookings, updateBookingStatus } from '../../lib/bookings';
 import { getProductById } from '../../data/products';
 import { format } from 'date-fns';
@@ -15,6 +15,7 @@ export const ReservationsPage = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [bookings, setBookings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -59,6 +60,10 @@ export const ReservationsPage = () => {
       default:
         return 'En attente';
     }
+  };
+
+  const toggleBookingDetails = (bookingId: string) => {
+    setSelectedBooking(selectedBooking === bookingId ? null : bookingId);
   };
 
   return (
@@ -142,6 +147,69 @@ export const ReservationsPage = () => {
                           </span>
                         </div>
                       </div>
+
+                      <Button
+                        onClick={() => toggleBookingDetails(booking.id)}
+                        className="mt-4 text-[#2C8DB0] hover:text-[#2C8DB0]/80 [font-family:'Montserrat_Alternates',Helvetica]"
+                      >
+                        {selectedBooking === booking.id ? 'Masquer les détails' : 'Voir les détails'}
+                      </Button>
+
+                      {selectedBooking === booking.id && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mt-4 space-y-2 bg-[#d9d9d9] rounded-[15px] p-4 shadow-[inset_5px_5px_13px_#a3a3a3e6,inset_-5px_-5px_10px_#ffffffe6]"
+                        >
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <h4 className="font-medium text-[#2C3E50] mb-2 [font-family:'Montserrat_Alternates',Helvetica]">
+                                Informations personnelles
+                              </h4>
+                              <div className="space-y-2">
+                                <p className="text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
+                                  {booking.first_name} {booking.last_name}
+                                </p>
+                                <div className="flex items-center gap-2">
+                                  <Mail className="w-4 h-4 text-[#2C8DB0]" />
+                                  <span className="text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
+                                    {booking.email}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Phone className="w-4 h-4 text-[#2C8DB0]" />
+                                  <span className="text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
+                                    {booking.phone}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <h4 className="font-medium text-[#2C3E50] mb-2 [font-family:'Montserrat_Alternates',Helvetica]">
+                                Adresse
+                              </h4>
+                              <p className="text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
+                                {booking.address}<br />
+                                {booking.city}, {booking.postal_code}
+                              </p>
+                            </div>
+                          </div>
+
+                          {booking.installation_notes && (
+                            <div className="mt-4">
+                              <h4 className="font-medium text-[#2C3E50] mb-2 flex items-center gap-2 [font-family:'Montserrat_Alternates',Helvetica]">
+                                <FileText className="w-4 h-4 text-[#2C8DB0]" />
+                                Notes d'installation
+                              </h4>
+                              <p className="text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
+                                {booking.installation_notes}
+                              </p>
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
                     </div>
 
                     <div className="flex flex-col items-end gap-4">

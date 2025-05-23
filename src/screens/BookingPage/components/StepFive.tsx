@@ -1,11 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/button';
-import { CheckCircle, ArrowLeft } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { getProductById } from '../../../data/products';
 import { Link } from 'react-router-dom';
+import { createBooking } from '../../../lib/bookings';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface StepFiveProps {
   selectedProductId: string | null;
@@ -16,6 +18,10 @@ interface StepFiveProps {
     lastName: string;
     email: string;
     phone: string;
+    address: string;
+    city: string;
+    postalCode: string;
+    installationNotes: string;
   };
   onReset: () => void;
 }
@@ -27,9 +33,33 @@ export const StepFive = ({
   formData,
   onReset
 }: StepFiveProps) => {
+  const { user } = useAuth();
   const selectedProduct = selectedProductId ? getProductById(selectedProductId) : null;
   const deposit = selectedProduct ? Math.round(selectedProduct.price * 0.3) : 0;
   const reservationNumber = `CYB-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+
+  React.useEffect(() => {
+    const saveBooking = async () => {
+      if (user && selectedProduct && selectedDate && selectedTime) {
+        await createBooking({
+          userId: user.id,
+          productId: selectedProduct.id,
+          bookingDate: selectedDate,
+          bookingTime: selectedTime,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          postalCode: formData.postalCode,
+          installationNotes: formData.installationNotes,
+        });
+      }
+    };
+
+    saveBooking();
+  }, []);
 
   if (!selectedProduct || !selectedDate || !selectedTime) {
     return null;

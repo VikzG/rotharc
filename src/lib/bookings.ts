@@ -6,6 +6,14 @@ export interface CreateBookingData {
   productId: string;
   bookingDate: Date;
   bookingTime: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  installationNotes: string;
 }
 
 export const createBooking = async ({
@@ -13,6 +21,14 @@ export const createBooking = async ({
   productId,
   bookingDate,
   bookingTime,
+  firstName,
+  lastName,
+  email,
+  phone,
+  address,
+  city,
+  postalCode,
+  installationNotes,
 }: CreateBookingData) => {
   try {
     const { data, error } = await supabase
@@ -22,6 +38,14 @@ export const createBooking = async ({
         product_id: productId,
         booking_date: bookingDate.toISOString(),
         booking_time: bookingTime,
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        phone: phone,
+        address: address,
+        city: city,
+        postal_code: postalCode,
+        installation_notes: installationNotes,
       })
       .select()
       .single();
