@@ -135,8 +135,23 @@ export const signIn = async ({ email, password }: SignInData) => {
 
 export const signOut = async () => {
   try {
+    // Récupérer la session actuelle
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      // Si pas de session, on considère que l'utilisateur est déjà déconnecté
+      return { success: true };
+    }
+
+    // Déconnexion
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+
+    // Vérifier que la déconnexion a bien eu lieu
+    const { data: { session: checkSession } } = await supabase.auth.getSession();
+    if (checkSession) {
+      throw new Error('La déconnexion a échoué');
+    }
     
     toast.success('Déconnexion réussie !');
     return { success: true };
