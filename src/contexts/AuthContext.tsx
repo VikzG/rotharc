@@ -24,34 +24,46 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    const initAuth = async () => {
-      const data = await getCurrentUser();
-      if (!mounted) return;
+    async function initAuth() {
+      try {
+        const data = await getCurrentUser();
+        if (!mounted) return;
 
-      if (data) {
-        setUser(data.user);
-        setProfile(data.profile);
-      } else {
-        setUser(null);
-        setProfile(null);
+        if (data) {
+          setUser(data.user);
+          setProfile(data.profile);
+        } else {
+          setUser(null);
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error('Error in initAuth:', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
-      setLoading(false);
-    };
+    }
 
     initAuth();
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
 
-      if (session) {
-        const data = await getCurrentUser();
-        setUser(data?.user || null);
-        setProfile(data?.profile || null);
-      } else {
-        setUser(null);
-        setProfile(null);
+      try {
+        if (session) {
+          const data = await getCurrentUser();
+          setUser(data?.user || null);
+          setProfile(data?.profile || null);
+        } else {
+          setUser(null);
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error('Error in auth state change:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => {
