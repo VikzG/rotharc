@@ -22,17 +22,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('AuthProvider mounted');
     let mounted = true;
 
     async function initAuth() {
+      console.log('Initializing auth...');
       try {
         const data = await getCurrentUser();
-        if (!mounted) return;
+        console.log('InitAuth response:', data);
+        
+        if (!mounted) {
+          console.log('Component unmounted, skipping state update');
+          return;
+        }
 
         if (data) {
+          console.log('Setting user and profile data');
           setUser(data.user);
           setProfile(data.profile);
         } else {
+          console.log('No user data, clearing state');
           setUser(null);
           setProfile(null);
         }
@@ -44,6 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } finally {
         if (mounted) {
+          console.log('Setting loading to false');
           setLoading(false);
         }
       }
@@ -52,15 +62,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initAuth();
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!mounted) return;
+      console.log('Auth state changed:', event, session);
+      if (!mounted) {
+        console.log('Component unmounted, skipping auth state change');
+        return;
+      }
 
       if (session) {
+        console.log('Session exists, fetching user data');
         const data = await getCurrentUser();
         if (mounted) {
+          console.log('Setting user data from auth change');
           setUser(data?.user || null);
           setProfile(data?.profile || null);
         }
       } else {
+        console.log('No session, clearing user data');
         if (mounted) {
           setUser(null);
           setProfile(null);
@@ -68,11 +85,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       
       if (mounted) {
+        console.log('Setting loading to false after auth change');
         setLoading(false);
       }
     });
 
     return () => {
+      console.log('AuthProvider unmounting');
       mounted = false;
       listener.subscription.unsubscribe();
     };

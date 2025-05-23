@@ -53,11 +53,13 @@ export const signUp = async ({ email, password, firstName, lastName }: SignUpDat
 };
 
 export const signIn = async ({ email, password }: SignInData) => {
+  console.log('Starting signIn process...');
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    console.log('Auth response:', { data, error });
 
     if (error) {
       console.error('SignIn error:', error);
@@ -69,11 +71,19 @@ export const signIn = async ({ email, password }: SignInData) => {
       return { success: false, error: new Error('No user data returned') };
     }
 
-    const { data: profile } = await supabase
+    console.log('Fetching profile data...');
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', data.user.id)
       .single();
+    
+    console.log('Profile response:', { profile, profileError });
+
+    if (profileError) {
+      console.error('Profile fetch error:', profileError);
+      return { success: false, error: profileError };
+    }
 
     toast.success('Connexion réussie !');
     return { success: true, user: data.user, profile };
@@ -123,8 +133,10 @@ export const deleteAccount = async () => {
 };
 
 export const getCurrentUser = async () => {
+  console.log('Fetching current user...');
   try {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
+    console.log('GetUser response:', { user, userError });
     
     if (userError) {
       console.error('Error fetching user:', userError);
@@ -132,14 +144,18 @@ export const getCurrentUser = async () => {
     }
 
     if (!user) {
+      console.log('No user found');
       return null;
     }
 
+    console.log('Fetching user profile...');
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single();
+
+    console.log('Profile fetch response:', { profile, profileError });
 
     if (profileError) {
       console.error('Error fetching profile:', profileError);
