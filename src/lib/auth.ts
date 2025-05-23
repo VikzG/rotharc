@@ -60,10 +60,12 @@ export const signIn = async ({ email, password }: SignInData) => {
     });
 
     if (error) {
+      console.error('SignIn error:', error);
       throw error;
     }
 
     if (!data.user) {
+      console.error('No user data returned from signIn');
       throw new Error('No user data returned');
     }
 
@@ -71,7 +73,7 @@ export const signIn = async ({ email, password }: SignInData) => {
     return { success: true, user: data.user };
 
   } catch (error: any) {
-    console.error('Error signing in:', error);
+    console.error('Error in signIn:', error);
     
     if (error.message?.includes('Invalid login credentials')) {
       toast.error('Email ou mot de passe incorrect');
@@ -79,7 +81,7 @@ export const signIn = async ({ email, password }: SignInData) => {
       toast.error('Erreur de connexion. Veuillez réessayer.');
     }
     
-    throw error;
+    return { success: false, error };
   }
 };
 
@@ -116,32 +118,35 @@ export const deleteAccount = async () => {
 
 export const getCurrentUser = async () => {
   try {
-    // Récupérer l'utilisateur actuel
+    console.log('Fetching current user...');
     const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError) throw userError;
-
-    // Si pas d'utilisateur, retourner null immédiatement
-    if (!user) {
+    
+    if (userError) {
+      console.error('Error fetching user:', userError);
       return null;
     }
 
-    // Récupérer le profil
+    if (!user) {
+      console.log('No user found');
+      return null;
+    }
+
+    console.log('User found, fetching profile...');
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single();
 
-    // Si erreur de profil, ne pas bloquer, juste logger
     if (profileError) {
       console.warn('Error fetching profile:', profileError);
       return { user, profile: null };
     }
 
+    console.log('Profile found, returning data');
     return { user, profile };
   } catch (error) {
     console.error('Error in getCurrentUser:', error);
-    // En cas d'erreur, retourner null pour éviter le blocage
     return null;
   }
 };
