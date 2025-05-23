@@ -34,6 +34,24 @@ export const signUp = async ({ email, password, firstName, lastName }: SignUpDat
       throw new Error('No user data returned');
     }
 
+    // Create profile after successful signup
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert([
+        {
+          id: authData.user.id,
+          first_name: firstName,
+          last_name: lastName,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+      ]);
+
+    if (profileError) {
+      console.error('Error creating profile:', profileError);
+      throw profileError;
+    }
+
     toast.success('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
     return { success: true };
 
@@ -148,7 +166,7 @@ export const getCurrentUser = async () => {
       return null;
     }
 
-    console.log('Fetching user profile...');
+    console.log('Fetching user profile...', user.id);
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
