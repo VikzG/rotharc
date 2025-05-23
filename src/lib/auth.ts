@@ -79,7 +79,7 @@ export const signIn = async ({ email, password }: SignInData) => {
       toast.error('Erreur de connexion. Veuillez réessayer.');
     }
     
-    throw error; // Propagate the error to handle loading state in component
+    throw error;
   }
 };
 
@@ -116,24 +116,32 @@ export const deleteAccount = async () => {
 
 export const getCurrentUser = async () => {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error) throw error;
-    
-    if (user) {
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+    // Récupérer l'utilisateur actuel
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) throw userError;
 
-      if (profileError) throw profileError;
-
-      return { user, profile };
+    // Si pas d'utilisateur, retourner null immédiatement
+    if (!user) {
+      return null;
     }
 
-    return null;
+    // Récupérer le profil
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    // Si erreur de profil, ne pas bloquer, juste logger
+    if (profileError) {
+      console.warn('Error fetching profile:', profileError);
+      return { user, profile: null };
+    }
+
+    return { user, profile };
   } catch (error) {
-    console.error('Error getting current user:', error);
+    console.error('Error in getCurrentUser:', error);
+    // En cas d'erreur, retourner null pour éviter le blocage
     return null;
   }
 };
