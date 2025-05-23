@@ -36,7 +36,6 @@ export const signUp = async ({ email, password, firstName, lastName }: SignUpDat
 
     console.log('Creating profile for user:', authData.user.id);
     
-    // Create profile after successful signup
     const { error: profileError } = await supabase
       .from('profiles')
       .insert([
@@ -80,7 +79,6 @@ export const signIn = async ({ email, password }: SignInData) => {
       email,
       password,
     });
-    console.log('Auth response:', { data, error });
 
     if (error) {
       console.error('SignIn error:', error);
@@ -92,14 +90,11 @@ export const signIn = async ({ email, password }: SignInData) => {
       throw new Error('No user data returned');
     }
 
-    console.log('Fetching profile data...');
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', data.user.id)
       .single();
-    
-    console.log('Profile response:', { profile, profileError });
 
     if (profileError) {
       console.error('Profile fetch error:', profileError);
@@ -142,7 +137,7 @@ export const signIn = async ({ email, password }: SignInData) => {
       toast.error('Erreur de connexion. Veuillez réessayer.');
     }
     
-    return { success: false, error };
+    throw error;
   }
 };
 
@@ -181,7 +176,6 @@ export const getCurrentUser = async () => {
   console.log('Fetching current user...');
   try {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
-    console.log('GetUser response:', { user, userError });
     
     if (userError) {
       console.error('Error fetching user:', userError);
@@ -199,8 +193,6 @@ export const getCurrentUser = async () => {
       .select('*')
       .eq('id', user.id)
       .single();
-
-    console.log('Profile fetch response:', { profile, profileError });
 
     if (profileError) {
       if (profileError.code === 'PGRST116') {
