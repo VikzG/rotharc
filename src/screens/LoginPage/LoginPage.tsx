@@ -56,9 +56,13 @@ export const LoginPage = () => {
 
       if (result.success) {
         navigate('/');
+      } else {
+        console.error('Login failed:', result.error);
+        setErrors({ submit: 'Échec de la connexion. Veuillez réessayer.' });
       }
     } catch (error) {
       console.error('Login error:', error);
+      setErrors({ submit: 'Une erreur est survenue. Veuillez réessayer.' });
     } finally {
       setIsLoading(false);
     }
@@ -169,6 +173,10 @@ export const LoginPage = () => {
               </div>
             </div>
           </div>
+
+          {errors.submit && (
+            <p className="text-red-500 text-sm text-center">{errors.submit}</p>
+          )}
 
           <div className="flex items-center justify-between">
             <div className="flex items-center">
