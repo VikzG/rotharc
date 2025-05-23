@@ -166,12 +166,24 @@ export const signOut = async () => {
 
 export const deleteAccount = async () => {
   try {
-    const { error } = await supabase.auth.admin.deleteUser(
-      (await supabase.auth.getUser()).data.user?.id || ''
-    );
-    
-    if (error) throw error;
-    
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      throw new Error('No active session');
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-account`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete account');
+    }
+
     toast.success('Votre compte a été supprimé avec succès.');
     return { success: true };
   } catch (error) {
