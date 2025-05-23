@@ -22,16 +22,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('AuthProvider mounted');
     let mounted = true;
 
     async function initAuth() {
-      console.log('Initializing auth...');
       try {
         const data = await getCurrentUser();
         if (!mounted) return;
 
-        console.log('Auth data received:', data);
         if (data) {
           setUser(data.user);
           setProfile(data.profile);
@@ -47,7 +44,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } finally {
         if (mounted) {
-          console.log('Setting loading to false');
           setLoading(false);
         }
       }
@@ -56,37 +52,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initAuth();
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session ? 'session exists' : 'no session');
       if (!mounted) return;
 
-      try {
-        if (session) {
-          const data = await getCurrentUser();
-          if (mounted) {
-            setUser(data?.user || null);
-            setProfile(data?.profile || null);
-          }
-        } else {
-          if (mounted) {
-            setUser(null);
-            setProfile(null);
-          }
+      if (session) {
+        const data = await getCurrentUser();
+        if (mounted) {
+          setUser(data?.user || null);
+          setProfile(data?.profile || null);
         }
-      } catch (error) {
-        console.error('Error in auth state change:', error);
+      } else {
         if (mounted) {
           setUser(null);
           setProfile(null);
         }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+      }
+      
+      if (mounted) {
+        setLoading(false);
       }
     });
 
     return () => {
-      console.log('AuthProvider cleanup');
       mounted = false;
       listener.subscription.unsubscribe();
     };

@@ -61,16 +61,22 @@ export const signIn = async ({ email, password }: SignInData) => {
 
     if (error) {
       console.error('SignIn error:', error);
-      throw error;
+      return { success: false, error };
     }
 
     if (!data.user) {
       console.error('No user data returned from signIn');
-      throw new Error('No user data returned');
+      return { success: false, error: new Error('No user data returned') };
     }
 
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+
     toast.success('Connexion réussie !');
-    return { success: true, user: data.user };
+    return { success: true, user: data.user, profile };
 
   } catch (error: any) {
     console.error('Error in signIn:', error);
@@ -118,7 +124,6 @@ export const deleteAccount = async () => {
 
 export const getCurrentUser = async () => {
   try {
-    console.log('Fetching current user...');
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
     if (userError) {
@@ -127,11 +132,9 @@ export const getCurrentUser = async () => {
     }
 
     if (!user) {
-      console.log('No user found');
       return null;
     }
 
-    console.log('User found, fetching profile...');
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
@@ -139,11 +142,10 @@ export const getCurrentUser = async () => {
       .single();
 
     if (profileError) {
-      console.warn('Error fetching profile:', profileError);
+      console.error('Error fetching profile:', profileError);
       return { user, profile: null };
     }
 
-    console.log('Profile found, returning data');
     return { user, profile };
   } catch (error) {
     console.error('Error in getCurrentUser:', error);
