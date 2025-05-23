@@ -82,33 +82,65 @@ export const ProfilePage = () => {
     if (!file) return;
 
     try {
+      // Vérifier si le bucket existe, sinon le créer
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const avatarBucket = buckets?.find(b => b.name === 'avatars');
+      
+      if (!avatarBucket) {
+        const { error: bucketError } = await supabase.storage.createBucket('avatars', {
+          public: true,
+          fileSizeLimit: 1024 * 1024, // 1MB
+          allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif']
+        });
+        
+        if (bucketError) {
+          console.error('Error creating bucket:', bucketError);
+          throw new Error('Erreur lors de la création du bucket de stockage');
+        }
+      }
+
+      // Générer un nom de fichier unique
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${user?.id}/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      // Upload du fichier
+      const { error: uploadError, data } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Error uploading file:', uploadError);
+        throw new Error('Erreur lors du téléchargement du fichier');
+      }
 
+      // Récupérer l'URL publique
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
-      setFormData({ ...formData, avatarUrl: publicUrl });
-
+      // Mettre à jour le profil avec la nouvelle URL
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ avatar_url: publicUrl })
+        .update({ 
+          avatar_url: publicUrl,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', user?.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Error updating profile:', updateError);
+        throw new Error('Erreur lors de la mise à jour du profil');
+      }
 
+      setFormData(prev => ({ ...prev, avatarUrl: publicUrl }));
       toast.success('Avatar mis à jour avec succès !');
     } catch (error) {
-      console.error('Error uploading avatar:', error);
-      toast.error('Erreur lors du téléchargement de l\'avatar');
+      console.error('Error handling avatar:', error);
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de la mise à jour de l\'avatar');
     }
   };
 
