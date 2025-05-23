@@ -119,7 +119,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
                   </Link>
                 ))}
 
-                {!loading && user && (
+                {!loading && user ? (
                   <div className="relative">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
@@ -147,6 +147,24 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
                       {isUserMenuOpen && <UserMenu onClose={() => setIsUserMenuOpen(false)} />}
                     </motion.div>
                   </div>
+                ) : !loading && (
+                  <Link to="/login">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="relative group bg-[#d9d9d9] text-[#2C3E50] hover:bg-[#2C8DB0]/10 rounded-full w-10 h-10 shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 flex items-center justify-center"
+                      >
+                        <UserIcon className="w-4 h-4" />
+                        <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
+                          Connexion
+                        </span>
+                      </Button>
+                    </motion.div>
+                  </Link>
                 )}
               </motion.div>
             )}
@@ -193,7 +211,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
                 </Link>
               ))}
 
-              {!loading && user && (
+              {!loading && user ? (
                 <>
                   <Link to="/profile">
                     <motion.div
@@ -230,6 +248,16 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
                     <span className="[font-family:'Montserrat_Alternates',Helvetica]">Déconnexion</span>
                   </motion.div>
                 </>
+              ) : !loading && (
+                <Link to="/login">
+                  <motion.div
+                    whileHover={{ x: 10 }}
+                    className="flex items-center gap-3 px-6 py-3 text-[#2C3E50] hover:bg-[#2C8DB0]/10"
+                  >
+                    <UserIcon className="w-4 h-4" />
+                    <span className="[font-family:'Montserrat_Alternates',Helvetica]">Connexion</span>
+                  </motion.div>
+                </Link>
               )}
             </motion.div>
           )}
