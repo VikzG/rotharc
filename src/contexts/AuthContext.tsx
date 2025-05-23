@@ -20,15 +20,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     let mounted = true;
 
     async function initAuth() {
-      if (initialized) return;
-      
       try {
+        // Récupérer la session depuis Supabase
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -50,6 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return;
         }
 
+        // Récupérer les données de l'utilisateur et son profil
         const data = await getCurrentUser();
         
         if (!mounted) return;
@@ -70,15 +69,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } finally {
         if (mounted) {
           setLoading(false);
-          setInitialized(true);
         }
       }
     }
 
     initAuth();
 
+    // Écouter les changements d'état d'authentification
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!mounted || event === 'INITIAL_SESSION') return;
+      if (!mounted) return;
 
       if (session) {
         try {
@@ -104,7 +103,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       mounted = false;
       listener.subscription.unsubscribe();
     };
-  }, [initialized]);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, profile, loading, setUser }}>
