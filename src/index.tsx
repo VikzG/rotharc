@@ -11,6 +11,7 @@ import { NotFoundPage } from "./screens/NotFoundPage";
 import { BookingPage } from "./screens/BookingPage";
 import { ProfilePage } from "./screens/ProfilePage";
 import { ReservationsPage } from "./screens/ReservationsPage";
+import { AdminDashboard } from "./screens/AdminDashboard";
 import { AuthProvider } from "./contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
 
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
   {
     path: "/mes-reservations",
     element: <ReservationsPage />,
+  },
+  {
+    path: "/admin",
+    element: <AdminDashboard />,
   },
   {
     path: "*",
