@@ -19,7 +19,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const location = useLocation();
-  const { user, profile } = useAuth();
+  const { user, profile, loading } = useAuth();
 
   const isActiveRoute = (path: string) => location.pathname === path;
 
@@ -53,7 +53,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
 
   const navItems = [
     { path: '/', icon: <HomeIcon className="w-4 h-4 " />, label: 'Accueil' },
-    { path: '/catalogue', icon: <img className="w-[23px] h-[23px]\" alt="Catalogue\" src="/general-massage-area.png" />, label: 'Catalogue' },
+    { path: '/catalogue', icon: <img className="w-[23px] h-[23px]" alt="Catalogue" src="/general-massage-area.png" />, label: 'Catalogue' },
     { path: '/reservation', icon: <CalendarIcon className="w-4 h-4" />, label: 'Réservation' },
     { path: '/contact', icon: <MailIcon className="w-4 h-4" />, label: 'Contact' },
   ];
@@ -119,52 +119,56 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
                   </Link>
                 ))}
 
-                {user ? (
-                  <div className="relative">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                        className="relative group bg-[#d9d9d9] text-[#2C3E50] hover:bg-[#2C8DB0]/10 rounded-full w-10 h-10 shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 flex items-center justify-center overflow-hidden"
-                      >
-                        {profile?.avatar_url ? (
-                          <img 
-                            src={profile.avatar_url} 
-                            alt="Avatar" 
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          <UserIcon className="w-4 h-4" />
-                        )}
-                        <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
-                          Mon Compte
-                        </span>
-                      </Button>
-                      {isUserMenuOpen && <UserMenu onClose={() => setIsUserMenuOpen(false)} />}
-                    </motion.div>
-                  </div>
-                ) : (
-                  <Link to="/login">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="relative group bg-[#d9d9d9] text-[#2C3E50] hover:bg-[#2C8DB0]/10 rounded-full w-10 h-10 shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 flex items-center justify-center"
-                      >
-                        <UserIcon className="w-4 h-4" />
-                        <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
-                          Connexion
-                        </span>
-                      </Button>
-                    </motion.div>
-                  </Link>
+                {!loading && (
+                  <>
+                    {user ? (
+                      <div className="relative">
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                            className="relative group bg-[#d9d9d9] text-[#2C3E50] hover:bg-[#2C8DB0]/10 rounded-full w-10 h-10 shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 flex items-center justify-center overflow-hidden"
+                          >
+                            {profile?.avatar_url ? (
+                              <img 
+                                src={profile.avatar_url} 
+                                alt="Avatar" 
+                                className="w-full h-full object-cover rounded-full"
+                              />
+                            ) : (
+                              <UserIcon className="w-4 h-4" />
+                            )}
+                            <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
+                              Mon Compte
+                            </span>
+                          </Button>
+                          {isUserMenuOpen && <UserMenu onClose={() => setIsUserMenuOpen(false)} />}
+                        </motion.div>
+                      </div>
+                    ) : (
+                      <Link to="/login">
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="relative group bg-[#d9d9d9] text-[#2C3E50] hover:bg-[#2C8DB0]/10 rounded-full w-10 h-10 shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 flex items-center justify-center"
+                          >
+                            <UserIcon className="w-4 h-4" />
+                            <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
+                              Connexion
+                            </span>
+                          </Button>
+                        </motion.div>
+                      </Link>
+                    )}
+                  </>
                 )}
               </motion.div>
             )}
@@ -211,53 +215,57 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
                 </Link>
               ))}
 
-              {user ? (
+              {!loading && (
                 <>
-                  <Link to="/profile">
-                    <motion.div
-                      whileHover={{ x: 10 }}
-                      className="flex items-center gap-3 px-6 py-3 text-[#2C3E50] hover:bg-[#2C8DB0]/10"
-                    >
-                      {profile?.avatar_url ? (
-                        <img 
-                          src={profile.avatar_url} 
-                          alt="Avatar" 
-                          className="w-6 h-6 rounded-full object-cover"
-                        />
-                      ) : (
+                  {user ? (
+                    <>
+                      <Link to="/profile">
+                        <motion.div
+                          whileHover={{ x: 10 }}
+                          className="flex items-center gap-3 px-6 py-3 text-[#2C3E50] hover:bg-[#2C8DB0]/10"
+                        >
+                          {profile?.avatar_url ? (
+                            <img 
+                              src={profile.avatar_url} 
+                              alt="Avatar" 
+                              className="w-6 h-6 rounded-full object-cover"
+                            />
+                          ) : (
+                            <UserIcon className="w-4 h-4" />
+                          )}
+                          <span className="[font-family:'Montserrat_Alternates',Helvetica]">Mon Profil</span>
+                        </motion.div>
+                      </Link>
+                      <Link to="/mes-reservations">
+                        <motion.div
+                          whileHover={{ x: 10 }}
+                          className="flex items-center gap-3 px-6 py-3 text-[#2C3E50] hover:bg-[#2C8DB0]/10"
+                        >
+                          <CalendarIcon className="w-4 h-4" />
+                          <span className="[font-family:'Montserrat_Alternates',Helvetica]">Mes Réservations</span>
+                        </motion.div>
+                      </Link>
+                      <motion.div
+                        whileHover={{ x: 10 }}
+                        className="flex items-center gap-3 px-6 py-3 text-[#2C3E50] hover:bg-[#2C8DB0]/10 cursor-pointer"
+                        onClick={handleSignOut}
+                      >
+                        <LogOutIcon className="w-4 h-4" />
+                        <span className="[font-family:'Montserrat_Alternates',Helvetica]">Déconnexion</span>
+                      </motion.div>
+                    </>
+                  ) : (
+                    <Link to="/login">
+                      <motion.div
+                        whileHover={{ x: 10 }}
+                        className="flex items-center gap-3 px-6 py-3 text-[#2C3E50] hover:bg-[#2C8DB0]/10"
+                      >
                         <UserIcon className="w-4 h-4" />
-                      )}
-                      <span className="[font-family:'Montserrat_Alternates',Helvetica]">Mon Profil</span>
-                    </motion.div>
-                  </Link>
-                  <Link to="/mes-reservations">
-                    <motion.div
-                      whileHover={{ x: 10 }}
-                      className="flex items-center gap-3 px-6 py-3 text-[#2C3E50] hover:bg-[#2C8DB0]/10"
-                    >
-                      <CalendarIcon className="w-4 h-4" />
-                      <span className="[font-family:'Montserrat_Alternates',Helvetica]">Mes Réservations</span>
-                    </motion.div>
-                  </Link>
-                  <motion.div
-                    whileHover={{ x: 10 }}
-                    className="flex items-center gap-3 px-6 py-3 text-[#2C3E50] hover:bg-[#2C8DB0]/10 cursor-pointer"
-                    onClick={handleSignOut}
-                  >
-                    <LogOutIcon className="w-4 h-4" />
-                    <span className="[font-family:'Montserrat_Alternates',Helvetica]">Déconnexion</span>
-                  </motion.div>
+                        <span className="[font-family:'Montserrat_Alternates',Helvetica]">Connexion</span>
+                      </motion.div>
+                    </Link>
+                  )}
                 </>
-              ) : (
-                <Link to="/login">
-                  <motion.div
-                    whileHover={{ x: 10 }}
-                    className="flex items-center gap-3 px-6 py-3 text-[#2C3E50] hover:bg-[#2C8DB0]/10"
-                  >
-                    <UserIcon className="w-4 h-4" />
-                    <span className="[font-family:'Montserrat_Alternates',Helvetica]">Connexion</span>
-                  </motion.div>
-                </Link>
               )}
             </motion.div>
           )}

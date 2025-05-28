@@ -19,7 +19,8 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -33,6 +34,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (mounted) {
             setUser(null);
             setProfile(null);
+            setLoading(false);
+            setInitialized(true);
           }
           return;
         }
@@ -41,6 +44,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (mounted) {
             setUser(null);
             setProfile(null);
+            setLoading(false);
+            setInitialized(true);
           }
           return;
         }
@@ -56,11 +61,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(null);
           setProfile(null);
         }
+        
+        setLoading(false);
+        setInitialized(true);
       } catch (error) {
         console.error('Error in initAuth:', error);
         if (mounted) {
           setUser(null);
           setProfile(null);
+          setLoading(false);
+          setInitialized(true);
         }
       }
     }
@@ -69,6 +79,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
+
+      if (!initialized) return;
+
+      setLoading(true);
 
       if (session) {
         try {
@@ -91,13 +105,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
         setProfile(null);
       }
+      
+      setLoading(false);
     });
 
     return () => {
       mounted = false;
       listener.subscription.unsubscribe();
     };
-  }, []);
+  }, [initialized]);
 
   return (
     <AuthContext.Provider value={{ user, profile, loading, setUser }}>
