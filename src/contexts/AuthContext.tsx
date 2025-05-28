@@ -19,15 +19,13 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let mounted = true;
 
     async function initAuth() {
       try {
-        setLoading(true);
-
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -64,10 +62,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(null);
           setProfile(null);
         }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
       }
     }
 
@@ -75,8 +69,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
-
-      setLoading(true);
 
       if (session) {
         try {
@@ -99,8 +91,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
         setProfile(null);
       }
-      
-      setLoading(false);
     });
 
     return () => {

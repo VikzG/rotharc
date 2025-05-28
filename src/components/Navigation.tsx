@@ -19,7 +19,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const location = useLocation();
-  const { user, profile, loading } = useAuth();
+  const { user, profile } = useAuth();
 
   const isActiveRoute = (path: string) => location.pathname === path;
 
@@ -119,7 +119,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
                   </Link>
                 ))}
 
-                {!loading && user ? (
+                {user ? (
                   <div className="relative">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
@@ -147,7 +147,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
                       {isUserMenuOpen && <UserMenu onClose={() => setIsUserMenuOpen(false)} />}
                     </motion.div>
                   </div>
-                ) : !loading && (
+                ) : (
                   <Link to="/login">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
@@ -211,7 +211,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
                 </Link>
               ))}
 
-              {!loading && user ? (
+              {user ? (
                 <>
                   <Link to="/profile">
                     <motion.div
@@ -248,7 +248,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
                     <span className="[font-family:'Montserrat_Alternates',Helvetica]">Déconnexion</span>
                   </motion.div>
                 </>
-              ) : !loading && (
+              ) : (
                 <Link to="/login">
                   <motion.div
                     whileHover={{ x: 10 }}
