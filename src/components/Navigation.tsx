@@ -53,7 +53,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
 
   const navItems = [
     { path: '/', icon: <HomeIcon className="w-4 h-4 " />, label: 'Accueil' },
-    { path: '/catalogue', icon: <img className="w-[23px] h-[23px]" alt="Catalogue" src="/general-massage-area.png" />, label: 'Catalogue' },
+    { path: '/catalogue', icon: <img className="w-[23px] h-[23px]\" alt="Catalogue\" src="/general-massage-area.png" />, label: 'Catalogue' },
     { path: '/reservation', icon: <CalendarIcon className="w-4 h-4" />, label: 'Réservation' },
     { path: '/contact', icon: <MailIcon className="w-4 h-4" />, label: 'Contact' },
   ];
