@@ -53,7 +53,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
 
   const navItems = [
     { path: '/', icon: <HomeIcon className="w-4 h-4 " />, label: 'Accueil' },
-    { path: '/catalogue', icon: <img className="w-[23px] h-[23px]\" alt="Catalogue\" src="/general-massage-area.png" />, label: 'Catalogue' },
+    { path: '/catalogue', icon: <img className="w-[23px] h-[23px]" alt="Catalogue" src="/general-massage-area.png" />, label: 'Catalogue' },
     { path: '/reservation', icon: <CalendarIcon className="w-4 h-4" />, label: 'Réservation' },
     { path: '/contact', icon: <MailIcon className="w-4 h-4" />, label: 'Contact' },
   ];
@@ -71,7 +71,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
         opacity: visible ? 1 : 0
       }}
       transition={{ duration: 0.3 }}
-      className="fixed top-5 right-5 z-50 bg-[#d9d9d9] backdrop-blur-sm rounded-full mx-auto"
+      className={`fixed top-5 ${isMobile ? 'right-2 left-2' : 'right-5'} z-50 bg-[#d9d9d9] backdrop-blur-sm rounded-full mx-auto`}
     >
       <div className={`flex justify-between items-center px-4 md:px-8 ${isMobile ? 'h-[75px]' : 'h-[100px]'}`}>
         <Link to="/">
