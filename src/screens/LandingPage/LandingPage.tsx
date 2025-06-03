@@ -57,7 +57,7 @@ const enhancementCards = [
   },
 ];
 
-export const LandingPage = (): JSX.Element => {
+export const LandingPage = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [visibleCards, setVisibleCards] = useState<number[]>([]);
@@ -177,7 +177,7 @@ export const LandingPage = (): JSX.Element => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="mx-auto text-4xl font-semibold [font-family:'Montserrat_Alternates',Helvetica] text-transparent bg-clip-text bg-gradient-to-r from-[#2C8DB0] via-[#66AEDD] to-[#003366] mb-6"
+            className="mx-auto text-4xl font-semibold [font-family:'Montserrat_Alternates',Helvetica] text-white animate-glow mb-6"
           >
             Nos Améliorations
           </motion.h2>
@@ -227,7 +227,7 @@ export const LandingPage = (): JSX.Element => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center text-4xl font-semibold [font-family:'Montserrat_Alternates',Helvetica] text-transparent bg-clip-text bg-gradient-to-r from-[#2C8DB0] via-[#66AEDD] to-[#003366] mb-6"
+            className="text-center text-4xl font-semibold [font-family:'Montserrat_Alternates',Helvetica] text-white animate-glow mb-6"
           >
             Les Avis de nos clients
           </motion.h2>
