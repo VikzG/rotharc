@@ -188,7 +188,7 @@ export const LandingPage = () => {
             transition={{ duration: 0.5, delay: 0.5 }}
             className="text-center text-lg mx-auto text-[#443f3f] font-normal [font-family:'Montserrat_Alternates',Helvetica] max-w-[688px]"
           >
-            Explorez nos différentes catégories d&apos;améliorations
+            Explorez nos différentes catégories d'améliorations
             cybernétiques pour transcender vos limites humaines
           </motion.p>
         </section>
@@ -239,7 +239,7 @@ export const LandingPage = () => {
             className="text-center text-lg text-[#443f3f] font-normal [font-family:'Montserrat_Alternates',Helvetica] max-w-[688px] mx-auto mb-16"
           >
             Découvrez les expériences de ceux qui ont déja franchi le pas vers
-            l&apos;humanité augmentée
+            l'humanité augmentée
           </motion.p>
 
           <div className="relative">
@@ -257,7 +257,7 @@ export const LandingPage = () => {
 
         <section className="mt-32 px-8 mb-32">
           <Card className="max-w-[1173px] mx-auto bg-[#d9d9d9] rounded-[25px] shadow-[15px_15px_38px_#989898e6,-15px_-15px_30px_#ffffffe6,15px_-15px_30px_#98989833,-15px_15px_30px_#98989833,inset_-1px_-1px_2px_#98989880,inset_1px_1px_2px_#ffffff4c]">
-            <CardContent className="p-16">
+            <CardContent className="p-8 md:p-16">
               <div className="flex flex-col md:flex-row items-center justify-between gap-12">
                 <div className="flex-1">
                   <h2 className="text-4xl font-semibold mb-6 [font-family:'Montserrat_Alternates',Helvetica]">

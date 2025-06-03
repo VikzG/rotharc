@@ -1,7 +1,5 @@
-"use client";
-
-import { cn } from "../../lib/utils";
 import React, { useEffect, useState } from "react";
+import { cn } from "../../lib/utils";
 
 export const InfiniteMovingCards = ({
   items,
@@ -40,37 +38,20 @@ export const InfiniteMovingCards = ({
         }
       });
 
-      getDirection();
-      getSpeed();
       setStart(true);
     }
   }
 
-  const getDirection = () => {
-    if (containerRef.current) {
-      if (direction === "left") {
-        containerRef.current.style.setProperty(
-          "--animation-direction",
-          "forwards"
-        );
-      } else {
-        containerRef.current.style.setProperty(
-          "--animation-direction",
-          "reverse"
-        );
-      }
-    }
-  };
-
   const getSpeed = () => {
-    if (containerRef.current) {
-      if (speed === "fast") {
-        containerRef.current.style.setProperty("--animation-duration", "20s");
-      } else if (speed === "normal") {
-        containerRef.current.style.setProperty("--animation-duration", "40s");
-      } else {
-        containerRef.current.style.setProperty("--animation-duration", "80s");
-      }
+    switch (speed) {
+      case "fast":
+        return "30s";
+      case "normal":
+        return "40s";
+      case "slow":
+        return "50s";
+      default:
+        return "40s";
     }
   };
 
@@ -78,7 +59,7 @@ export const InfiniteMovingCards = ({
     <div
       ref={containerRef}
       className={cn(
-        "scroller relative z-20 max-w-7xl overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
+        "scroller relative z-20 max-w-5xl overflow-hidden",
         className
       )}
     >
@@ -89,11 +70,17 @@ export const InfiniteMovingCards = ({
           start && "animate-scroll",
           pauseOnHover && "hover:[animation-play-state:paused]"
         )}
+        style={
+          {
+            "--animation-duration": getSpeed(),
+            "--animation-direction": direction === "left" ? "forwards" : "reverse",
+          } as React.CSSProperties
+        }
       >
         {items.map((item, idx) => (
           <li
-            className="w-[350px] max-w-full relative rounded-2xl border border-b-0 flex-shrink-0 px-8 py-6 md:w-[450px] bg-[#d9d9d9] shadow-[15px_15px_38px_#989898e6,-15px_-15px_30px_#ffffffe6]"
-            key={`${item.name}-${idx}`}
+            key={idx}
+            className="w-[300px] md:w-[400px] max-w-full relative rounded-[25px] flex-shrink-0 bg-[#d9d9d9] px-8 py-6 shadow-[15px_15px_38px_#989898e6,-15px_-15px_30px_#ffffffe6]"
           >
             <blockquote>
               <div
