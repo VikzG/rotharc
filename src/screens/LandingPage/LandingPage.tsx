@@ -6,9 +6,9 @@ import {
   Heart,
   Dna,
 } from "lucide-react";
-import { useState, useEffect, useRef,useTransition } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { Button } from "../../components/ui/button";
-import { Card, CardContent } from "../../components/ui/card";
+import { Card } from "../../components/ui/card";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Footer } from "../../components/Footer";
 import { Navigation } from "../../components/Navigation";
@@ -16,53 +16,42 @@ import { SparklesPreview } from "../../components/SparklesPreview";
 import { InfiniteMovingCards } from "../../components/ui/infinite-moving-cards";
 import { Link } from "react-router-dom";
 import { getTestimonials } from "../../lib/testimonials";
-import { ModalBox } from "../../components/ui/modalBox";
 
 const enhancementCards = [
   {
     title: "Améliorations Neurales",
     description: "Augmentez vos capacités cognitives...",
-    modelPath: "/3d_assets/brain.glb",
+    videoUrl: "/videos/neural.mp4",
     icon: <BrainCircuit className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
-    sceneProps: {
-      scale: [5, 5, 5] as [number, number, number],
-      position: [0, 0, 0] as [number, number, number],
-      rotation: [0, Math.PI / 4, 0] as [number, number, number],
-    },
   },
   {
     title: "Vision Augmentée",
     description: "Voyez au-delà des limites humaines...",
-    modelPath: "/3d_assets/robotic_eye.glb",
+    videoUrl: "/videos/vision.mp4",
     icon: <ScanEye className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
-    sceneProps: {
-      scale: [1.5, 1.5, 1.5] as [number, number, number],
-      position: [0, 0, 0] as [number, number, number],
-      rotation: [0, Math.PI / 4, 0] as [number, number, number],
-    },
   },
   {
     title: "Performance Physique",
     description: "Dépassez vos limites physiques...",
-    modelPath: "/3d_assets/zap.glb",
+    videoUrl: "/videos/performance.mp4",
     icon: <Zap className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
   },
   {
     title: "Protection Avancée",
     description: "Protégez-vous des menaces...",
-    modelPath: "/3d_assets/shield.glb",
+    videoUrl: "/videos/protection.mp4",
     icon: <ShieldPlus className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
   },
   {
     title: "Améliorations Organiques",
     description: "Optimisez vos organes vitaux...",
-    modelPath: "/3d_assets/heart.glb",
+    videoUrl: "/videos/organic.mp4",
     icon: <Heart className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
   },
   {
     title: "Évolution Génétique",
     description: "Redéfinissez votre code génétique...",
-    modelPath: "/3d_assets/dna.glb",
+    videoUrl: "/videos/genetic.mp4",
     icon: <Dna className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
   },
 ];
@@ -83,7 +72,7 @@ export const LandingPage = (): JSX.Element => {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 600], [0, -150]);
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -93,8 +82,7 @@ export const LandingPage = (): JSX.Element => {
 
   useEffect(() => {
     const fetchTestimonials = async () => {
-      const { success, testimonials: fetchedTestimonials } =
-        await getTestimonials();
+      const { success, testimonials: fetchedTestimonials } = await getTestimonials();
       if (success && fetchedTestimonials) {
         setTestimonials(fetchedTestimonials);
       }
@@ -105,7 +93,7 @@ export const LandingPage = (): JSX.Element => {
 
   const handleCardClick = (index: number) => {
     startTransition(() => {
-      setSelected(index); // Envelopper cette mise à jour dans `startTransition`
+      setSelected(index);
     });
   };
 
@@ -158,9 +146,6 @@ export const LandingPage = (): JSX.Element => {
     setExpandedCard(expandedCard === index ? null : index);
   };
 
-  function closeModal(): void {
-    setSelected(null);
-  }
   return (
     <div className="bg-[#d9d9d9] flex flex-row justify-center w-full">
       <div className="bg-[#d9d9d9] overflow-hidden w-full relative">
@@ -221,13 +206,24 @@ export const LandingPage = (): JSX.Element => {
                 variants={cardVariants}
                 initial="hidden"
                 animate={visibleCards.includes(index) ? "visible" : "hidden"}
-                className="cursor-glow h-[418px] bg-[#222222] rounded-[25px] cursor-pointer overflow-hidden transition-shadow duration-300"
+                className="cursor-glow h-[418px] bg-[#222222] rounded-[25px] cursor-pointer overflow-hidden transition-shadow duration-300 relative"
               >
                 <motion.div
                   variants={cardVariants}
                   initial="hidden"
                   animate={visibleCards.includes(index) ? "visible" : "hidden"}
-                  className="flex items-center justify-center h-full p-8 "                >
+                  className="flex items-center justify-center h-full p-8 relative"
+                >
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover opacity-50"
+                  >
+                    <source src={card.videoUrl} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
                   {card.icon}
                 </motion.div>
               </motion.button>
@@ -292,18 +288,7 @@ export const LandingPage = (): JSX.Element => {
             </CardContent>
           </Card>
         </section>
-        <section className="relative">
-          {selected !== null && (
-        <ModalBox
-        isOpen={selected !== null}
-        onClose={closeModal}
-        title={enhancementCards[selected].title}
-        description={enhancementCards[selected].description}
-        modelPath={enhancementCards[selected].modelPath}
-        sceneProps={enhancementCards[selected].sceneProps || { scale: [1, 1, 1], position: [0, 0, 0], rotation: [0, 0, 0] }}
-      />
-          )}
-        </section>
+
         <Footer />
       </div>
     </div>
