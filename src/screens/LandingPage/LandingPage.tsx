@@ -16,41 +16,42 @@ import { SparklesPreview } from "../../components/SparklesPreview";
 import { InfiniteMovingCards } from "../../components/ui/infinite-moving-cards";
 import { Link } from "react-router-dom";
 import { getTestimonials } from "../../lib/testimonials";
+import { EnhancementModal } from "../../components/ui/enhancement-modal";
 
 const enhancementCards = [
   {
     title: "Améliorations Neurales",
-    description: "Augmentez vos capacités cognitives...",
+    description: "Augmentez vos capacités cognitives avec notre interface neurale de pointe. Connectez votre cerveau directement aux systèmes numériques pour une expérience sans précédent. Traitez l'information à la vitesse de la pensée et exploitez pleinement votre potentiel cognitif.",
     videoUrl: "https://player.vimeo.com/external/451837085.sd.mp4?s=beee37bfea495d2ec2bb31c54c81f57822f7f35f&profile_id=164&oauth2_token_id=57447761",
     icon: <BrainCircuit className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
   {
     title: "Vision Augmentée",
-    description: "Voyez au-delà des limites humaines...",
+    description: "Découvrez une nouvelle dimension de la vision avec nos implants oculaires avancés. Voyez au-delà du spectre visible, zoomez à volonté et enregistrez chaque instant en haute définition. Une révolution visuelle qui transformera votre perception du monde.",
     videoUrl: "https://player.vimeo.com/external/477721941.sd.mp4?s=e4e6e3c133d96a11679f6ab1e0528d0a68f6b8e9&profile_id=164&oauth2_token_id=57447761",
     icon: <ScanEye className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
   {
     title: "Performance Physique",
-    description: "Dépassez vos limites physiques...",
+    description: "Transcendez vos limites physiques grâce à nos améliorations biomécaniques. Augmentez votre force, votre endurance et vos réflexes au-delà des capacités humaines normales. Devenez la meilleure version de vous-même.",
     videoUrl: "https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1a9e7c02d&profile_id=164&oauth2_token_id=57447761",
     icon: <Zap className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
   {
     title: "Protection Avancée",
-    description: "Protégez-vous des menaces...",
+    description: "Assurez votre sécurité avec notre système de défense dermique révolutionnaire. Une protection invisible mais impénétrable contre les menaces physiques, tout en préservant votre sensibilité tactile naturelle.",
     videoUrl: "https://player.vimeo.com/external/438453069.sd.mp4?s=f42f4b0be0037b2b9f3c1c95b2c37876dd517f75&profile_id=164&oauth2_token_id=57447761",
     icon: <ShieldPlus className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
   {
     title: "Améliorations Organiques",
-    description: "Optimisez vos organes vitaux...",
+    description: "Optimisez vos organes vitaux avec nos implants bioniques de dernière génération. Améliorez l'efficacité de votre système cardiovasculaire, respiratoire et digestif pour une santé et des performances optimales.",
     videoUrl: "https://player.vimeo.com/external/370467553.sd.mp4?s=96de8b923370fb7fa8616d4e0b74ee9c4ba5576f&profile_id=164&oauth2_token_id=57447761",
     icon: <Heart className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
   {
     title: "Évolution Génétique",
-    description: "Redéfinissez votre code génétique...",
+    description: "Prenez le contrôle de votre code génétique avec notre technologie d'édition génomique avancée. Corrigez les imperfections, renforcez votre immunité et débloquez votre véritable potentiel génétique.",
     videoUrl: "https://player.vimeo.com/external/449253665.sd.mp4?s=d2a3339cd6145b8672b02ab6ea43817f22e606b2&profile_id=164&oauth2_token_id=57447761",
     icon: <Dna className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
@@ -67,7 +68,6 @@ export const LandingPage = (): JSX.Element => {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<number | null>(null);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 600], [0, -150]);
@@ -94,16 +94,6 @@ export const LandingPage = (): JSX.Element => {
   const handleCardClick = (index: number) => {
     startTransition(() => {
       setSelected(index);
-      // Play/pause video on click
-      videoRefs.current.forEach((video, i) => {
-        if (i === index) {
-          if (video?.paused) {
-            video.play();
-          } else {
-            video?.pause();
-          }
-        }
-      });
     });
   };
 
@@ -216,24 +206,14 @@ export const LandingPage = (): JSX.Element => {
                 variants={cardVariants}
                 initial="hidden"
                 animate={visibleCards.includes(index) ? "visible" : "hidden"}
-                className="cursor-glow h-[418px] bg-[#222222] rounded-[25px] cursor-pointer overflow-hidden transition-shadow duration-300 relative"
+                className="cursor-glow h-[418px] bg-[#222222] rounded-[25px] cursor-pointer overflow-hidden transition-shadow duration-300"
               >
                 <motion.div
                   variants={cardVariants}
                   initial="hidden"
                   animate={visibleCards.includes(index) ? "visible" : "hidden"}
-                  className="flex items-center justify-center h-full p-8 relative"
+                  className="flex items-center justify-center h-full p-8"
                 >
-                  <video
-                    ref={(el) => (videoRefs.current[index] = el)}
-                    loop
-                    muted
-                    playsInline
-                    className="absolute inset-0 w-full h-full object-cover opacity-50"
-                  >
-                    <source src={card.videoUrl} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
                   {card.icon}
                 </motion.div>
               </motion.button>
@@ -298,6 +278,16 @@ export const LandingPage = (): JSX.Element => {
             </CardContent>
           </Card>
         </section>
+
+        {selected !== null && (
+          <EnhancementModal
+            isOpen={selected !== null}
+            onClose={() => setSelected(null)}
+            title={enhancementCards[selected].title}
+            description={enhancementCards[selected].description}
+            videoUrl={enhancementCards[selected].videoUrl}
+          />
+        )}
 
         <Footer />
       </div>
