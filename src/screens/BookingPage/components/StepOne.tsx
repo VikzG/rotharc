@@ -30,23 +30,25 @@ export const StepOne = ({ selectedProduct, onSelectProduct, onNext }: StepOnePro
               }`}
             onClick={() => onSelectProduct(product.id)}
           >
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-grow">
+                  <h3 className="text-lg font-medium text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
+                    {product.name}
+                  </h3>
+                  <p className="text-sm text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
+                    {product.shortDescription}
+                  </p>
+                </div>
               </div>
-              <div className="flex-grow">
-                <h3 className="text-lg font-medium text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
-                  {product.name}
-                </h3>
-                <p className="text-sm text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
-                  {product.shortDescription}
-                </p>
-              </div>
-              <div className="flex-shrink-0 text-right">
+              <div className="text-right">
                 <p className="text-xl font-semibold text-[#2C8DB0] [font-family:'Montserrat_Alternates',Helvetica]">
                   {product.price.toLocaleString()} €
                 </p>
