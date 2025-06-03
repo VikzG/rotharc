@@ -12,7 +12,7 @@ function SparklesInstance({
   minSize = 0.5,
   maxSize = 1.5,
 }) {
-  const mesh = useRef<THREE.Points>(null);
+  const mesh = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
   const particles = useMemo(() => {
@@ -29,30 +29,6 @@ function SparklesInstance({
     }
     return temp;
   }, [count]);
-
-  const particlesGeometry = useMemo(() => {
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-
-    particles.forEach((particle, i) => {
-      positions[i * 3] = particle.x;
-      positions[i * 3 + 1] = particle.y;
-      positions[i * 3 + 2] = particle.z;
-
-      const color = new THREE.Color(
-        colors[Math.floor(Math.random() * colors.length)]
-      );
-      colors[i * 3] = color.r;
-      colors[i * 3 + 1] = color.g;
-      colors[i * 3 + 2] = color.b;
-    });
-
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-
-    return geometry;
-  }, [count, colors, particles]);
 
   useFrame(() => {
     particles.forEach((particle, i) => {
@@ -80,15 +56,14 @@ function SparklesInstance({
   });
 
   return (
-    <points ref={mesh} geometry={particlesGeometry}>
-      <pointsMaterial
-        size={Math.random() * (maxSize - minSize) + minSize}
-        sizeAttenuation
-        vertexColors
+    <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
+      <sphereGeometry args={[0.5, 32, 32]} />
+      <meshPhongMaterial
+        color={colors[0]}
         transparent
         opacity={0.6}
       />
-    </points>
+    </instancedMesh>
   );
 }
 
@@ -113,6 +88,7 @@ export function SparklesCore({
           background: background || "transparent",
         }}
       >
+        <ambientLight intensity={0.5} />
         <SparklesInstance
           count={particleDensity}
           colors={[particleColor]}
