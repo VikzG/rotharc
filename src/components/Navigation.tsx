@@ -71,11 +71,11 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
         opacity: visible ? 1 : 0
       }}
       transition={{ duration: 0.3 }}
-      className={`fixed top-5 ${isMobile ? 'right-2 left-2' : 'right-5'} z-50 bg-[#d9d9d9] backdrop-blur-sm rounded-full mx-auto`}
+      className={`fixed top-5 z-50 bg-[#d9d9d9] backdrop-blur-sm rounded-full mx-auto ${isMobile ? 'w-[70%] left-1/2 -translate-x-1/2' : 'right-5'}`}
     >
-      <div className={`flex justify-between items-center px-4 md:px-8 ${isMobile ? 'h-[75px]' : 'h-[100px]'}`}>
+      <div className={`flex justify-between items-center px-4 md:px-8 ${isMobile ? 'h-[52.5px]' : 'h-[75px]'}`}>
         <Link to="/">
-          <motion.div className={`mx-5 ${isMobile ? 'scale-75' : ''}`}>
+          <motion.div className={`mx-5 ${isMobile ? 'scale-[0.525]' : ''}`}>
             <svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="-50 -50 650 200">
               <text fontFamily="Mars" fontSize="86.667" fill="#010101" x="246" y="38" textAnchor="middle">Rotharc</text>
               <text fontFamily="Rajdhani" fontSize="53.333" fill="#443f3f" x="400" y="120" textAnchor="middle">technologies</text>
@@ -181,9 +181,9 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
               variant="ghost"
               size="icon"
               onClick={toggleNav}
-              className={`rounded-full bg-[#d9d9d9] text-[#2C3E50] hover:bg-[#2C8DB0]/10 shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 flex items-center justify-center ${isMobile ? 'w-[37.5px] h-[37.5px]' : 'w-[50px] h-[50px]'}`}
+              className={`rounded-full bg-[#d9d9d9] text-[#2C3E50] hover:bg-[#2C8DB0]/10 shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 flex items-center justify-center ${isMobile ? 'w-[26.25px] h-[26.25px]' : 'w-[50px] h-[50px]'}`}
             >
-              <MenuIcon className={`w-6 h-6 transition-transform duration-300 ${isNavVisible ? 'rotate-90' : 'rotate-0'}`} />
+              <MenuIcon className={`w-4 h-4 md:w-6 md:h-6 transition-transform duration-300 ${isNavVisible ? 'rotate-90' : 'rotate-0'}`} />
             </Button>
           </motion.div>
         </div>
