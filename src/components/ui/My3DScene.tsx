@@ -1,57 +1,67 @@
-import React, { useRef, useState, useEffect } from "react";
-import { useGLTF } from "@react-three/drei";
-import { Group } from "three";
-import { useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
+import { useGLTF, Stage, PresentationControls } from "@react-three/drei";
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
 
-interface My3DSceneProps {
-  path: string;
+interface ModelProps {
+  modelPath: string;
   scale?: [number, number, number];
   position?: [number, number, number];
   rotation?: [number, number, number];
-  rotationSpeed?: number;
 }
 
-const My3DScene: React.FC<My3DSceneProps> = ({
-  path,
-  scale = [1, 1, 1],
-  position = [0, 0, 0],
-  rotation = [0, 0, 0],
-  rotationSpeed = 0.01,
-}) => {
-  const { scene, error, isLoading } = useGLTF(path);
-  const ref = useRef<Group>(null);
-  const [isError, setIsError] = useState(false);
+function Model({ modelPath, scale = [1, 1, 1], position = [0, 0, 0], rotation = [0, 0, 0] }: ModelProps) {
+  const { scene } = useGLTF(modelPath);
+  return <primitive object={scene} scale={scale} position={position} rotation={rotation} />;
+}
 
-  useEffect(() => {
-    if (error) {
-      console.error(`Error loading model at ${path}: `, error);
-      setIsError(true);
-    }
-  }, [error]);
+interface My3DSceneProps {
+  modelPath: string;
+  sceneProps?: {
+    scale?: [number, number, number];
+    position?: [number, number, number];
+    rotation?: [number, number, number];
+  };
+}
 
-  useFrame(() => {
-    if (ref.current && !isError) {
-      ref.current.rotation.y += rotationSpeed;
-    }
-  });
-
-  if (isLoading) {
-    return <div>Chargement...</div>;
-  }
-
-  if (isError) {
-    return <div>Erreur lors du chargement du modèle 3D.</div>;
-  }
-
+export default function My3DScene({ modelPath, sceneProps }: My3DSceneProps) {
   return (
-    <primitive
-      ref={ref}
-      object={scene}
-      scale={scale}
-      position={position}
-      rotation={rotation}
-    />
+    <div className="w-full h-full">
+      <Suspense
+        fallback={
+          <div className="w-full h-full flex items-center justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-[#2C8DB0]" />
+          </div>
+        }
+      >
+        <Canvas
+          camera={{ position: [0, 0, 5], fov: 45 }}
+          style={{ background: 'transparent' }}
+        >
+          <PresentationControls
+            global
+            rotation={[0, -Math.PI / 4, 0]}
+            polar={[-Math.PI / 4, Math.PI / 4]}
+            azimuth={[-Math.PI / 4, Math.PI / 4]}
+            config={{ mass: 2, tension: 400 }}
+            snap={{ mass: 4, tension: 400 }}
+          >
+            <Stage
+              intensity={0.5}
+              environment="city"
+              adjustCamera={false}
+              shadows={false}
+            >
+              <Model 
+                modelPath={modelPath}
+                scale={sceneProps?.scale || [1, 1, 1]}
+                position={sceneProps?.position || [0, 0, 0]}
+                rotation={sceneProps?.rotation || [0, 0, 0]}
+              />
+            </Stage>
+          </PresentationControls>
+        </Canvas>
+      </Suspense>
+    </div>
   );
-};
-
-export default My3DScene;
+}
