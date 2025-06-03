@@ -21,38 +21,38 @@ const enhancementCards = [
   {
     title: "Améliorations Neurales",
     description: "Augmentez vos capacités cognitives...",
-    videoUrl: "/videos/neural.mp4",
-    icon: <BrainCircuit className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
+    videoUrl: "https://player.vimeo.com/external/451837085.sd.mp4?s=beee37bfea495d2ec2bb31c54c81f57822f7f35f&profile_id=164&oauth2_token_id=57447761",
+    icon: <BrainCircuit className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
   {
     title: "Vision Augmentée",
     description: "Voyez au-delà des limites humaines...",
-    videoUrl: "/videos/vision.mp4",
-    icon: <ScanEye className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
+    videoUrl: "https://player.vimeo.com/external/477721941.sd.mp4?s=e4e6e3c133d96a11679f6ab1e0528d0a68f6b8e9&profile_id=164&oauth2_token_id=57447761",
+    icon: <ScanEye className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
   {
     title: "Performance Physique",
     description: "Dépassez vos limites physiques...",
-    videoUrl: "/videos/performance.mp4",
-    icon: <Zap className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
+    videoUrl: "https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1a9e7c02d&profile_id=164&oauth2_token_id=57447761",
+    icon: <Zap className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
   {
     title: "Protection Avancée",
     description: "Protégez-vous des menaces...",
-    videoUrl: "/videos/protection.mp4",
-    icon: <ShieldPlus className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
+    videoUrl: "https://player.vimeo.com/external/438453069.sd.mp4?s=f42f4b0be0037b2b9f3c1c95b2c37876dd517f75&profile_id=164&oauth2_token_id=57447761",
+    icon: <ShieldPlus className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
   {
     title: "Améliorations Organiques",
     description: "Optimisez vos organes vitaux...",
-    videoUrl: "/videos/organic.mp4",
-    icon: <Heart className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
+    videoUrl: "https://player.vimeo.com/external/370467553.sd.mp4?s=96de8b923370fb7fa8616d4e0b74ee9c4ba5576f&profile_id=164&oauth2_token_id=57447761",
+    icon: <Heart className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
   {
     title: "Évolution Génétique",
     description: "Redéfinissez votre code génétique...",
-    videoUrl: "/videos/genetic.mp4",
-    icon: <Dna className="w-[90px] h-[90px] card-icon stroke-[0.5px]" />,
+    videoUrl: "https://player.vimeo.com/external/449253665.sd.mp4?s=d2a3339cd6145b8672b02ab6ea43817f22e606b2&profile_id=164&oauth2_token_id=57447761",
+    icon: <Dna className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10" />,
   },
 ];
 
@@ -67,7 +67,7 @@ export const LandingPage = (): JSX.Element => {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<number | null>(null);
-  const close = () => setSelected(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 600], [0, -150]);
@@ -94,6 +94,16 @@ export const LandingPage = (): JSX.Element => {
   const handleCardClick = (index: number) => {
     startTransition(() => {
       setSelected(index);
+      // Play/pause video on click
+      videoRefs.current.forEach((video, i) => {
+        if (i === index) {
+          if (video?.paused) {
+            video.play();
+          } else {
+            video?.pause();
+          }
+        }
+      });
     });
   };
 
@@ -215,7 +225,7 @@ export const LandingPage = (): JSX.Element => {
                   className="flex items-center justify-center h-full p-8 relative"
                 >
                   <video
-                    autoPlay
+                    ref={(el) => (videoRefs.current[index] = el)}
                     loop
                     muted
                     playsInline
