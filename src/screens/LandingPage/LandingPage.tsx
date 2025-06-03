@@ -206,7 +206,7 @@ export const LandingPage = (): JSX.Element => {
                 variants={cardVariants}
                 initial="hidden"
                 animate={visibleCards.includes(index) ? "visible" : "hidden"}
-                className="cursor-glow h-[418px] bg-[#222222] rounded-[25px] cursor-pointer overflow-hidden transition-shadow duration-300"
+                className="cursor-glow h-[355px] bg-[#222222] rounded-[25px] cursor-pointer overflow-hidden transition-shadow duration-300"
               >
                 <motion.div
                   variants={cardVariants}
