@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef, useTransition } from "react";
 import { Button } from "../../components/ui/button";
-import { Card } from "../../components/ui/card";
+import { Card, CardContent } from "../../components/ui/card";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Footer } from "../../components/Footer";
 import { Navigation } from "../../components/Navigation";
