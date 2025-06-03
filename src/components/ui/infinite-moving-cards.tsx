@@ -1,4 +1,5 @@
 "use client";
+
 import { cn } from "../../lib/utils";
 import React, { useEffect, useState } from "react";
 
@@ -13,7 +14,6 @@ export const InfiniteMovingCards = ({
     quote: string;
     name: string;
     title: string;
-    image?: string;
   }[];
   direction?: "left" | "right";
   speed?: "fast" | "normal" | "slow";
@@ -26,9 +26,9 @@ export const InfiniteMovingCards = ({
   useEffect(() => {
     addAnimation();
   }, []);
-  
+
   const [start, setStart] = useState(false);
-  
+
   function addAnimation() {
     if (containerRef.current && scrollerRef.current) {
       const scrollerContent = Array.from(scrollerRef.current.children);
@@ -45,7 +45,7 @@ export const InfiniteMovingCards = ({
       setStart(true);
     }
   }
-  
+
   const getDirection = () => {
     if (containerRef.current) {
       if (direction === "left") {
@@ -61,7 +61,7 @@ export const InfiniteMovingCards = ({
       }
     }
   };
-  
+
   const getSpeed = () => {
     if (containerRef.current) {
       if (speed === "fast") {
@@ -73,7 +73,7 @@ export const InfiniteMovingCards = ({
       }
     }
   };
-  
+
   return (
     <div
       ref={containerRef}
@@ -85,37 +85,34 @@ export const InfiniteMovingCards = ({
       <ul
         ref={scrollerRef}
         className={cn(
-          "flex w-max min-w-full shrink-0 flex-nowrap gap-4 py-4",
+          "flex min-w-full shrink-0 gap-4 py-4 w-max flex-nowrap",
           start && "animate-scroll",
           pauseOnHover && "hover:[animation-play-state:paused]"
         )}
       >
         {items.map((item, idx) => (
           <li
-            className="relative w-[350px] max-w-full shrink-0 rounded-[25px] bg-[#d9d9d9] shadow-[15px_15px_38px_#989898e6,-15px_-15px_30px_#ffffffe6,15px_-15px_30px_#98989833,-15px_15px_30px_#98989833] p-6"
-            key={item.name}
+            className="w-[350px] max-w-full relative rounded-2xl border border-b-0 flex-shrink-0 px-8 py-6 md:w-[450px] bg-[#d9d9d9] shadow-[15px_15px_38px_#989898e6,-15px_-15px_30px_#ffffffe6]"
+            key={`${item.name}-${idx}`}
           >
             <blockquote>
-              <div className="flex items-center gap-4 mb-4">
-                {item.image && (
-                  <img
-                    className="w-[60px] h-[60px] rounded-full object-cover"
-                    alt="Profile"
-                    src={item.image}
-                  />
-                )}
-                <div>
-                  <h3 className="text-xl font-medium [font-family:'Montserrat_Alternates',Helvetica]">
-                    {item.name}
-                  </h3>
-                  <p className="text-base font-light [font-family:'Montserrat_Alternates',Helvetica]">
-                    {item.title}
-                  </p>
-                </div>
-              </div>
-              <p className="text-base font-light italic text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
+              <div
+                aria-hidden="true"
+                className="user-select-none -z-1 pointer-events-none absolute -left-0.5 -top-0.5 h-[calc(100%_+_4px)] w-[calc(100%_+_4px)]"
+              ></div>
+              <span className="relative z-20 text-sm leading-[1.6] text-[#443f3f] font-normal [font-family:'Montserrat_Alternates',Helvetica]">
                 {item.quote}
-              </p>
+              </span>
+              <div className="relative z-20 mt-6 flex flex-row items-center">
+                <span className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
+                    {item.name}
+                  </span>
+                  <span className="text-sm text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
+                    {item.title}
+                  </span>
+                </span>
+              </div>
             </blockquote>
           </li>
         ))}
