@@ -53,7 +53,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
 
   const navItems = [
     { path: '/', icon: <HomeIcon className="w-4 h-4 " />, label: 'Accueil' },
-    { path: '/catalogue', icon: <img className="w-[23px] h-[23px]\" alt="Catalogue\" src="/general-massage-area.png" />, label: 'Catalogue' },
+    { path: '/catalogue', icon: <img className="w-[23px] h-[23px]" alt="Catalogue" src="/general-massage-area.png" />, label: 'Catalogue' },
     { path: '/reservation', icon: <CalendarIcon className="w-4 h-4" />, label: 'Réservation' },
     { path: '/contact', icon: <MailIcon className="w-4 h-4" />, label: 'Contact' },
   ];
@@ -85,11 +85,11 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
 
         <div className="flex items-center">
           <AnimatePresence>
-            {isNavVisible && (
+            {isNavVisible && !isMobile && (
               <motion.div
                 initial={{ opacity: 0, width: 0 }}
                 animate={{ opacity: 1, width: 'auto'}}
-                exit={{ opacity: 0,width:0}}
+                exit={{ opacity: 0, width: 0}}
                 transition={{ duration: 0.3}}
                 className="flex items-center gap-2 md:gap-4 pr-4"
               >
@@ -197,7 +197,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="absolute top-full left-0 right-0 bg-[#d9d9d9] backdrop-blur-sm shadow-lg py-4"
+              className="absolute top-full left-0 right-0 bg-[#d9d9d9] backdrop-blur-sm shadow-lg py-4 rounded-[25px] mt-4"
             >
               {navItems.map((item) => (
                 <Link key={item.path} to={item.path}>
