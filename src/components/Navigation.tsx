@@ -53,7 +53,7 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
 
   const navItems = [
     { path: '/', icon: <HomeIcon className="w-4 h-4 " />, label: 'Accueil' },
-    { path: '/catalogue', icon: <img className="w-[23px] h-[23px]\" alt="Catalogue\" src="/general-massage-area.png" />, label: 'Catalogue' },
+    { path: '/catalogue', icon: <img className="w-[23px] h-[23px]" alt="Catalogue" src="/general-massage-area.png" />, label: 'Catalogue' },
     { path: '/reservation', icon: <CalendarIcon className="w-4 h-4" />, label: 'Réservation' },
     { path: '/contact', icon: <MailIcon className="w-4 h-4" />, label: 'Contact' },
   ];
@@ -71,11 +71,11 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
         opacity: visible ? 1 : 0
       }}
       transition={{ duration: 0.3 }}
-      className="fixed top-5 right-5 z-50 bg-[#d9d9d9] backdrop-blur-sm rounded-full mx-auto"
+      className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 bg-[#d9d9d9] backdrop-blur-sm rounded-full w-[95%] max-w-[600px] mx-auto"
     >
       <div className="flex justify-between items-center px-4 md:px-8">
-        <Link to="/">
-          <motion.div className="mx-5">
+        <Link to="/" className="flex-shrink-0">
+          <motion.div className="mx-2 md:mx-5 scale-75 md:scale-100 origin-left">
             <svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="-50 -50 650 200">
               <text fontFamily="Mars" fontSize="86.667" fill="#010101" x="246" y="38" textAnchor="middle">Rotharc</text>
               <text fontFamily="Rajdhani" fontSize="53.333" fill="#443f3f" x="400" y="120" textAnchor="middle">technologies</text>
@@ -181,9 +181,9 @@ export const Navigation = ({ isNavVisible, toggleNav }: NavigationProps) => {
               variant="ghost"
               size="icon"
               onClick={toggleNav}
-              className="w-[50px] h-[50px] rounded-full bg-[#d9d9d9] text-[#2C3E50] hover:bg-[#2C8DB0]/10 shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 flex items-center justify-center"
+              className="w-[40px] h-[40px] rounded-full bg-[#d9d9d9] text-[#2C3E50] hover:bg-[#2C8DB0]/10 shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 flex items-center justify-center"
             >
-              <MenuIcon className={`w-6 h-6 transition-transform duration-300 ${isNavVisible ? 'rotate-90' : 'rotate-0'}`} />
+              <MenuIcon className={`w-5 h-5 transition-transform duration-300 ${isNavVisible ? 'rotate-90' : 'rotate-0'}`} />
             </Button>
           </motion.div>
         </div>
