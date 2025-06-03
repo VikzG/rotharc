@@ -149,3 +149,9 @@
 .cursor-glow:hover .card-icon {
   animation: iconGlow 2s ease-in-out infinite alternate;
 }
+
+@media (max-width: 768px) {
+  .animate-iconGlow {
+    animation: iconGlow 2s ease-in-out infinite alternate;
+  }
+}
