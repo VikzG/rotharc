@@ -22,7 +22,7 @@ const enhancementCards = [
   {
     title: "Améliorations Neurales",
     description: "Augmentez vos capacités cognitives avec notre interface neurale de pointe. Connectez votre cerveau directement aux systèmes numériques pour une expérience sans précédent. Traitez l'information à la vitesse de la pensée et exploitez pleinement votre potentiel cognitif.",
-    videoUrl: "https://player.vimeo.com/external/451837085.sd.mp4?s=beee37bfea495d2ec2bb31c54c81f57822f7f35f&profile_id=164&oauth2_token_id=57447761",
+    videoUrl: "https://www.youtube.com/watch?v=dIAA1zo3JR8",
     icon: <BrainCircuit className="w-[90px] h-[90px] card-icon stroke-[0.5px] relative z-10 md:animate-none animate-iconGlow" />,
   },
   {
@@ -57,7 +57,7 @@ const enhancementCards = [
   },
 ];
 
-export const LandingPage = (): JSX.Element => {
+export const LandingPage = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [visibleCards, setVisibleCards] = useState<number[]>([]);
@@ -206,7 +206,7 @@ export const LandingPage = (): JSX.Element => {
                 variants={cardVariants}
                 initial="hidden"
                 animate={visibleCards.includes(index) ? "visible" : "hidden"}
-                className="cursor-glow h-[355px] bg-[#222222] rounded-[25px] cursor-pointer overflow-hidden transition-shadow duration-300"
+                className="cursor-glow h-[355px] md:h-[418px] bg-[#222222] rounded-[25px] cursor-pointer overflow-hidden transition-shadow duration-300"
               >
                 <motion.div
                   variants={cardVariants}

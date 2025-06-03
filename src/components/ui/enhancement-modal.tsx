@@ -34,7 +34,7 @@ export const EnhancementModal: React.FC<EnhancementModalProps> = ({
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative z-50 w-full max-w-4xl bg-[#d9d9d9] rounded-[25px] overflow-hidden shadow-[15px_15px_38px_#989898e6,-15px_-15px_30px_#ffffffe6]"
+          className="relative z-50 w-full max-w-4xl bg-[#d9d9d9] rounded-[25px] overflow-hidden"
         >
           <button
             onClick={onClose}
@@ -49,16 +49,9 @@ export const EnhancementModal: React.FC<EnhancementModalProps> = ({
             </h2>
 
             <div className="relative w-full h-[400px] rounded-[15px] overflow-hidden mb-6 shadow-[inset_5px_5px_13px_#a3a3a3e6,inset_-5px_-5px_10px_#ffffffe6]">
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover"
-              >
-                <source src={videoUrl} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+<iframe width="100%" height="100%"
+src="https://www.youtube.com/watch?v=dIAA1zo3JR8">
+</iframe>
             </div>
 
             <p className="text-lg text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
