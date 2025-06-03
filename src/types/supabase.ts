@@ -93,6 +93,26 @@ export interface Database {
           updated_at?: string
         }
       }
+      admin_users: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          is_super_admin: boolean
+        }
+        Insert: {
+          id: string
+          created_at?: string
+          updated_at?: string
+          is_super_admin?: boolean
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          is_super_admin?: boolean
+        }
+      }
     }
   }
 }
