@@ -4,10 +4,11 @@ import { Button } from '../../../components/ui/button';
 import { CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { getProductById } from '../../../data/products';
+import { getProductById } from '../../../lib/products';
 import { Link } from 'react-router-dom';
 import { createBooking } from '../../../lib/bookings';
 import { useAuth } from '../../../contexts/AuthContext';
+import { Product } from '../../../types';
 
 interface StepFiveProps {
   selectedProductId: string | null;
@@ -34,9 +35,21 @@ export const StepFive = ({
   onReset
 }: StepFiveProps) => {
   const { user } = useAuth();
-  const selectedProduct = selectedProductId ? getProductById(selectedProductId) : null;
-  const deposit = selectedProduct ? Math.round(selectedProduct.price * 0.3) : 0;
+  const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
   const reservationNumber = `CYB-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+
+  React.useEffect(() => {
+    const fetchProduct = async () => {
+      if (selectedProductId) {
+        const product = await getProductById(selectedProductId);
+        setSelectedProduct(product);
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [selectedProductId]);
 
   React.useEffect(() => {
     const saveBooking = async () => {
@@ -59,11 +72,23 @@ export const StepFive = ({
     };
 
     saveBooking();
-  }, []);
+  }, [selectedProduct]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-[#2C3E50] text-xl [font-family:'Montserrat_Alternates',Helvetica]">
+          Finalisation de votre réservation...
+        </p>
+      </div>
+    );
+  }
 
   if (!selectedProduct || !selectedDate || !selectedTime) {
     return null;
   }
+
+  const deposit = Math.round(selectedProduct.price * 0.3);
 
   return (
     <motion.div

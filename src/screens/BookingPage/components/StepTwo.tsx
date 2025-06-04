@@ -4,9 +4,10 @@ import { Button } from '../../../components/ui/button';
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { getProductById } from '../../../data/products';
+import { getProductById } from '../../../lib/products';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
+import { Product } from '../../../types';
 
 interface StepTwoProps {
   selectedDate: Date | undefined;
@@ -38,7 +39,30 @@ export const StepTwo = ({
   onPrevious
 }: StepTwoProps) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const selectedProduct = selectedProductId ? getProductById(selectedProductId) : null;
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    const fetchProduct = async () => {
+      if (selectedProductId) {
+        const product = await getProductById(selectedProductId);
+        setSelectedProduct(product);
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [selectedProductId]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-[#2C3E50] text-xl [font-family:'Montserrat_Alternates',Helvetica]">
+          Chargement du produit...
+        </p>
+      </div>
+    );
+  }
 
   if (!selectedProduct) {
     return null;

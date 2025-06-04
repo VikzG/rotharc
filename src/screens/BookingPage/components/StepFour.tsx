@@ -4,7 +4,8 @@ import { Button } from '../../../components/ui/button';
 import { CreditCard, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { getProductById } from '../../../data/products';
+import { getProductById } from '../../../lib/products';
+import { Product } from '../../../types';
 
 interface StepFourProps {
   selectedProductId: string | null;
@@ -23,8 +24,30 @@ export const StepFour = ({
 }: StepFourProps) => {
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'crypto'>('card');
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const selectedProduct = selectedProductId ? getProductById(selectedProductId) : null;
+  React.useEffect(() => {
+    const fetchProduct = async () => {
+      if (selectedProductId) {
+        const product = await getProductById(selectedProductId);
+        setSelectedProduct(product);
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [selectedProductId]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-[#2C3E50] text-xl [font-family:'Montserrat_Alternates',Helvetica]">
+          Chargement du produit...
+        </p>
+      </div>
+    );
+  }
 
   if (!selectedProduct || !selectedDate || !selectedTime) {
     return null;

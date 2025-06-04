@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/button';
-import { products } from '../../../data/products';
+import { getProducts } from '../../../lib/products';
+import { Product } from '../../../types';
 
 interface StepOneProps {
   selectedProduct: string | null;
@@ -10,6 +11,29 @@ interface StepOneProps {
 }
 
 export const StepOne = ({ selectedProduct, onSelectProduct, onNext }: StepOneProps) => {
+  const [products, setProducts] = React.useState<Product[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchProducts = async () => {
+      const fetchedProducts = await getProducts();
+      setProducts(fetchedProducts);
+      setIsLoading(false);
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-[#2C3E50] text-xl [font-family:'Montserrat_Alternates',Helvetica]">
+          Chargement des produits...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold text-[#2C3E50] mb-6 [font-family:'Montserrat_Alternates',Helvetica]">
@@ -34,7 +58,7 @@ export const StepOne = ({ selectedProduct, onSelectProduct, onNext }: StepOnePro
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                   <img
-                    src={product.imageUrl}
+                    src={product.image_url}
                     alt={product.name}
                     className="w-full h-full object-cover"
                   />
@@ -44,7 +68,7 @@ export const StepOne = ({ selectedProduct, onSelectProduct, onNext }: StepOnePro
                     {product.name}
                   </h3>
                   <p className="text-sm text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
-                    {product.shortDescription}
+                    {product.short_description}
                   </p>
                 </div>
               </div>
