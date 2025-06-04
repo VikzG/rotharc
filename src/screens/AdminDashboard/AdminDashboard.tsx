@@ -42,7 +42,7 @@ export const AdminDashboard = () => {
 
       try {
         // Récupérer tous les utilisateurs de auth
-        const { data: authData, error: authError } = await supabase.auth.admin.getUsers();
+        const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
         
         if (authError) {
           throw authError;
