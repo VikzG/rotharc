@@ -40,15 +40,7 @@ export const AdminDashboard = () => {
     const fetchUsers = async () => {
       if (!isAdmin) return;
 
-      // Get all users from auth.users
-      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-      
-      if (authError) {
-        console.error('Error fetching auth users:', authError);
-        return;
-      }
-
-      // Get all profiles
+      // Get all profiles with admin status
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select(`
@@ -63,19 +55,25 @@ export const AdminDashboard = () => {
         return;
       }
 
-      // Combine auth users with profiles
-      const combinedUsers = authUsers.users.map(authUser => {
-        const profile = profiles?.find(p => p.id === authUser.id) || {};
-        return {
-          ...authUser,
-          ...profile,
-          is_online: authUser.last_sign_in_at ? 
-            (new Date().getTime() - new Date(authUser.last_sign_in_at).getTime()) < 300000 // 5 minutes
-            : false
-        };
-      });
+      // Get auth metadata for each user
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
 
-      setUsers(combinedUsers);
+      const authUsers = await Promise.all(
+        profiles.map(async (profile) => {
+          const { data: authData } = await supabase.auth.admin.getUserById(profile.id);
+          return {
+            ...profile,
+            is_online: authData?.user?.last_sign_in_at ? 
+              (new Date().getTime() - new Date(authData.user.last_sign_in_at).getTime()) < 300000 // 5 minutes
+              : false,
+            last_sign_in_at: authData?.user?.last_sign_in_at,
+            banned: authData?.user?.banned
+          };
+        })
+      );
+
+      setUsers(authUsers);
       setLoading(false);
     };
 
