@@ -6,7 +6,7 @@ import { Button } from '../../components/ui/button';
 import { useAuth } from '../../contexts/AuthContext';
 import { Calendar, Clock, MapPin, Mail, Phone, FileText } from 'lucide-react';
 import { getUserBookings, updateBookingStatus } from '../../lib/bookings';
-import { getProductById } from '../../data/products';
+import { getProductById } from '../../lib/products';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
