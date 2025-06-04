@@ -4,17 +4,27 @@ import { motion } from 'framer-motion';
 import { Navigation } from '../../components/Navigation';
 import { Footer } from '../../components/Footer';
 import { Button } from '../../components/ui/button';
-import { getProductById } from '../../data/products';
+import { getProductById } from '../../lib/products';
 import { ArrowLeft, Star, Shield } from 'lucide-react';
+import { Product } from '../../types';
 
 export const ProductPage = () => {
   const { id } = useParams();
-  const product = getProductById(id || '');
+  const [product, setProduct] = React.useState<Product | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [activeTab, setActiveTab] = React.useState('description');
 
-  if (!product) {
-    return <div>Produit non trouvé</div>;
-  }
+  React.useEffect(() => {
+    const fetchProduct = async () => {
+      if (id) {
+        const fetchedProduct = await getProductById(id);
+        setProduct(fetchedProduct);
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }).map((_, index) => (
@@ -28,6 +38,33 @@ export const ProductPage = () => {
       />
     ));
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#d9d9d9] flex items-center justify-center">
+        <p className="text-[#2C3E50] text-xl [font-family:'Montserrat_Alternates',Helvetica]">
+          Chargement du produit...
+        </p>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-[#d9d9d9] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-[#2C3E50] text-xl mb-4 [font-family:'Montserrat_Alternates',Helvetica]">
+            Produit non trouvé
+          </p>
+          <Link to="/catalogue">
+            <Button className="bg-[#2C8DB0] text-white hover:bg-[#2C8DB0]/90">
+              Retour au catalogue
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#d9d9d9]">
@@ -53,7 +90,7 @@ export const ProductPage = () => {
           >
             <div className="rounded-[25px] overflow-hidden shadow-[15px_15px_38px_#989898e6,-15px_-15px_30px_#ffffffe6]">
               <img
-                src={product.imageUrl}
+                src={product.image_url}
                 alt={product.name}
                 className="w-full h-[400px] object-cover"
               />
@@ -71,13 +108,13 @@ export const ProductPage = () => {
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <p className="text-sm text-[#2C3E50] mb-1 [font-family:'Montserrat_Alternates',Helvetica]">
-                    {product.category} / {product.subCategory}
+                    {product.category} / {product.sub_category}
                   </p>
                   <h1 className="text-4xl font-semibold [font-family:'Montserrat_Alternates',Helvetica]">
                     {product.name}
                   </h1>
                 </div>
-                {product.isNew && (
+                {product.is_new && (
                   <span className="bg-[#2C8DB0] text-white px-3 py-1 rounded-full text-sm [font-family:'Montserrat_Alternates',Helvetica]">
                     Nouveau
                   </span>
@@ -87,7 +124,7 @@ export const ProductPage = () => {
               <div className="flex items-center gap-1 mb-4">
                 {renderStars(product.rating)}
                 <span className="ml-2 text-sm text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
-                  ({product.reviewCount} avis)
+                  ({product.review_count} avis)
                 </span>
               </div>
 
@@ -96,7 +133,7 @@ export const ProductPage = () => {
               </p>
 
               <p className="text-lg text-[#443f3f] mb-8 [font-family:'Montserrat_Alternates',Helvetica]">
-                {product.shortDescription}
+                {product.short_description}
               </p>
             </div>
 

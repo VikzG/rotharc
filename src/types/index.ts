@@ -2,15 +2,15 @@ export interface Product {
   id: string;
   name: string;
   category: string;
-  subCategory: string;
+  sub_category: string;
   price: number;
   description: string;
-  shortDescription: string;
-  imageUrl: string;
+  short_description: string;
+  image_url: string;
   rating: number;
-  reviewCount: number;
+  review_count: number;
   features: string[];
   compatibility: string[];
-  isNew: boolean;
-  isFeatured: boolean;
+  is_new: boolean;
+  is_featured: boolean;
 }

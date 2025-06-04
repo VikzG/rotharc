@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Navigation } from '../../components/Navigation';
 import { Footer } from '../../components/Footer';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
-import { products } from '../../data/products';
+import { getProducts } from '../../lib/products';
 import { Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Product } from '../../types';
 
 const categories = [
   "Tous",
@@ -21,6 +22,18 @@ const categories = [
 export const CataloguePage = () => {
   const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [isNavVisible, setIsNavVisible] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const fetchedProducts = await getProducts();
+      setProducts(fetchedProducts);
+      setIsLoading(false);
+    };
+
+    fetchProducts();
+  }, []);
 
   const toggleNav = () => {
     setIsNavVisible(!isNavVisible);
@@ -55,6 +68,16 @@ export const CataloguePage = () => {
       }
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#d9d9d9] flex items-center justify-center">
+        <p className="text-[#2C3E50] text-xl [font-family:'Montserrat_Alternates',Helvetica]">
+          Chargement des produits...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#d9d9d9]">
@@ -105,11 +128,11 @@ export const CataloguePage = () => {
                 <Card className="overflow-hidden bg-[#d9d9d9] rounded-[25px] shadow-[15px_15px_38px_#989898e6,-15px_-15px_30px_#ffffffe6,15px_-15px_30px_#98989833,-15px_15px_30px_#98989833]">
                   <div className="relative">
                     <img
-                      src={product.imageUrl}
+                      src={product.image_url}
                       alt={product.name}
                       className="w-full h-48 object-cover"
                     />
-                    {product.isNew && (
+                    {product.is_new && (
                       <span className="absolute top-4 right-4 bg-gradient-to-r from-[#2C8DB0] via-[#66AEDD] to-[#003366] text-white px-3 py-1 rounded-full text-sm [font-family:'Montserrat_Alternates',Helvetica]">
                         Nouveau
                       </span>
@@ -122,7 +145,7 @@ export const CataloguePage = () => {
                           {product.name}
                         </h3>
                         <p className="text-sm text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
-                          {product.category} - {product.subCategory}
+                          {product.category} - {product.sub_category}
                         </p>
                       </div>
                       <div className="flex items-center">
@@ -133,7 +156,7 @@ export const CataloguePage = () => {
                       </div>
                     </div>
                     <p className="text-sm text-[#443f3f] mb-6 [font-family:'Montserrat_Alternates',Helvetica]">
-                      {product.shortDescription}
+                      {product.short_description}
                     </p>
                     <div className="flex justify-between items-center">
                       <span className="text-2xl font-semibold text-transparent bg-gradient-to-r from-[#2C8DB0] via-[#66AEDD] to-[#003366] bg-clip-text [font-family:'Montserrat_Alternates',Helvetica]">
