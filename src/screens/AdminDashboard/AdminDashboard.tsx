@@ -40,35 +40,56 @@ export const AdminDashboard = () => {
     const fetchUsers = async () => {
       if (!isAdmin) return;
 
-      // Get all profiles with admin status and online presence
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select(`
-          *,
-          admin_users (
-            is_super_admin
-          )
-        `);
+      try {
+        // Récupérer tous les utilisateurs de auth
+        const { data: authData, error: authError } = await supabase.auth.admin.getUsers();
+        
+        if (authError) {
+          throw authError;
+        }
 
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        return;
+        // Récupérer tous les profils avec leur statut admin
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select(`
+            *,
+            admin_users (
+              is_super_admin
+            )
+          `);
+
+        if (profilesError) {
+          throw profilesError;
+        }
+
+        // Get presence data
+        const presenceData = await supabase.channel('online-users').presenceState();
+
+        // Combiner les données
+        const processedUsers = authData.users.map(authUser => {
+          const profile = profiles?.find(p => p.id === authUser.id) || {};
+          return {
+            id: authUser.id,
+            email: authUser.email,
+            first_name: profile.first_name || authUser.user_metadata?.first_name || '',
+            last_name: profile.last_name || authUser.user_metadata?.last_name || '',
+            avatar_url: profile.avatar_url,
+            admin_users: profile.admin_users,
+            is_online: Object.values(presenceData).some(
+              presence => presence.user_id === authUser.id
+            ),
+            banned: authUser.banned || false,
+            last_sign_in_at: authUser.last_sign_in_at,
+          };
+        });
+
+        setUsers(processedUsers);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        toast.error('Failed to fetch users');
+      } finally {
+        setLoading(false);
       }
-
-      // Get presence data
-      const presenceData = await supabase.channel('online-users').presenceState();
-      
-      // Process users with online status
-      const processedUsers = profiles.map(profile => ({
-        ...profile,
-        is_online: Object.values(presenceData).some(
-          presence => presence.user_id === profile.id
-        ),
-        banned: false // Default value since we can't access auth.user data
-      }));
-
-      setUsers(processedUsers);
-      setLoading(false);
     };
 
     fetchUsers();
