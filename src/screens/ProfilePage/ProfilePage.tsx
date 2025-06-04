@@ -319,15 +319,6 @@ export const ProfilePage = () => {
             </div>
 
             <div className="flex justify-between items-center pt-6">
-              <Button
-                type="button"
-                onClick={() => setShowDeleteConfirmation(true)}
-                className="px-6 bg-red-500 text-white hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica] flex items-center gap-2"
-              >
-                <Trash2 className="w-4 h-4" />
-                Supprimer mon compte
-              </Button>
-
               <div className="flex gap-4">
                 {isEditing ? (
                   <>
@@ -355,6 +346,14 @@ export const ProfilePage = () => {
                   </Button>
                 )}
               </div>
+              <Button
+                type="button"
+                onClick={() => setShowDeleteConfirmation(true)}
+                className="px-6 bg-red-500 text-white hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all duration-300 [font-family:'Montserrat_Alternates',Helvetica] flex items-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Supprimer mon compte
+              </Button>
             </div>
           </form>
         </div>
