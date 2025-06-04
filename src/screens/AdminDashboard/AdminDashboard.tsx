@@ -40,7 +40,7 @@ export const AdminDashboard = () => {
     const fetchUsers = async () => {
       if (!isAdmin) return;
 
-      // Get all profiles with admin status
+      // Get all profiles with admin status and online presence
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select(`
@@ -55,25 +55,19 @@ export const AdminDashboard = () => {
         return;
       }
 
-      // Get auth metadata for each user
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      // Get presence data
+      const presenceData = await supabase.channel('online-users').presenceState();
+      
+      // Process users with online status
+      const processedUsers = profiles.map(profile => ({
+        ...profile,
+        is_online: Object.values(presenceData).some(
+          presence => presence.user_id === profile.id
+        ),
+        banned: false // Default value since we can't access auth.user data
+      }));
 
-      const authUsers = await Promise.all(
-        profiles.map(async (profile) => {
-          const { data: authData } = await supabase.auth.admin.getUserById(profile.id);
-          return {
-            ...profile,
-            is_online: authData?.user?.last_sign_in_at ? 
-              (new Date().getTime() - new Date(authData.user.last_sign_in_at).getTime()) < 300000 // 5 minutes
-              : false,
-            last_sign_in_at: authData?.user?.last_sign_in_at,
-            banned: authData?.user?.banned
-          };
-        })
-      );
-
-      setUsers(authUsers);
+      setUsers(processedUsers);
       setLoading(false);
     };
 
@@ -92,43 +86,76 @@ export const AdminDashboard = () => {
   }, [isAdmin]);
 
   const handleBanUser = async (userId: string) => {
-    const { error } = await supabase.rpc('ban_user', { user_id: userId });
-    
-    if (error) {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ban-user`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to ban user');
+      }
+
+      toast.success('User banned successfully');
+      // Refresh user list
+      const { data: users } = await supabase.from('profiles').select('*');
+      if (users) setUsers(users);
+    } catch (error) {
+      console.error('Error banning user:', error);
       toast.error('Failed to ban user');
-      return;
     }
-    
-    toast.success('User banned successfully');
-    // Refresh user list
-    const { data: users } = await supabase.from('profiles').select('*');
-    if (users) setUsers(users);
   };
 
   const handleUnbanUser = async (userId: string) => {
-    const { error } = await supabase.rpc('unban_user', { user_id: userId });
-    
-    if (error) {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/unban-user`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to unban user');
+      }
+
+      toast.success('User unbanned successfully');
+      // Refresh user list
+      const { data: users } = await supabase.from('profiles').select('*');
+      if (users) setUsers(users);
+    } catch (error) {
+      console.error('Error unbanning user:', error);
       toast.error('Failed to unban user');
-      return;
     }
-    
-    toast.success('User unbanned successfully');
-    // Refresh user list
-    const { data: users } = await supabase.from('profiles').select('*');
-    if (users) setUsers(users);
   };
 
   const handleDeleteUser = async (userId: string) => {
-    const { error } = await supabase.rpc('delete_user', { user_id: userId });
-    
-    if (error) {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+
+      toast.success('User deleted successfully');
+      setUsers(users.filter(u => u.id !== userId));
+    } catch (error) {
+      console.error('Error deleting user:', error);
       toast.error('Failed to delete user');
-      return;
     }
-    
-    toast.success('User deleted successfully');
-    setUsers(users.filter(u => u.id !== userId));
   };
 
   if (!isAdmin) {
