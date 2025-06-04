@@ -6,7 +6,7 @@ import { Button } from '../../components/ui/button';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'react-hot-toast';
-import { Ban, UserX, CheckCircle, Users } from 'lucide-react';
+import { Ban, UserX, CheckCircle, Users, Wifi, WifiOff } from 'lucide-react';
 
 export const AdminDashboard = () => {
   const { user } = useAuth();
@@ -40,7 +40,16 @@ export const AdminDashboard = () => {
     const fetchUsers = async () => {
       if (!isAdmin) return;
 
-      const { data: users, error } = await supabase
+      // Get all users from auth.users
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) {
+        console.error('Error fetching auth users:', authError);
+        return;
+      }
+
+      // Get all profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select(`
           *,
@@ -49,16 +58,39 @@ export const AdminDashboard = () => {
           )
         `);
 
-      if (error) {
-        console.error('Error fetching users:', error);
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
         return;
       }
 
-      setUsers(users);
+      // Combine auth users with profiles
+      const combinedUsers = authUsers.users.map(authUser => {
+        const profile = profiles?.find(p => p.id === authUser.id) || {};
+        return {
+          ...authUser,
+          ...profile,
+          is_online: authUser.last_sign_in_at ? 
+            (new Date().getTime() - new Date(authUser.last_sign_in_at).getTime()) < 300000 // 5 minutes
+            : false
+        };
+      });
+
+      setUsers(combinedUsers);
       setLoading(false);
     };
 
     fetchUsers();
+
+    // Set up real-time subscription for online status
+    const presence = supabase.channel('online-users')
+      .on('presence', { event: 'sync' }, () => {
+        fetchUsers();
+      })
+      .subscribe();
+
+    return () => {
+      presence.unsubscribe();
+    };
   }, [isAdmin]);
 
   const handleBanUser = async (userId: string) => {
@@ -150,6 +182,7 @@ export const AdminDashboard = () => {
                   <th className="text-left py-4 px-4">Email</th>
                   <th className="text-left py-4 px-4">Role</th>
                   <th className="text-left py-4 px-4">Status</th>
+                  <th className="text-left py-4 px-4">Online</th>
                   <th className="text-right py-4 px-4">Actions</th>
                 </tr>
               </thead>
@@ -173,6 +206,9 @@ export const AdminDashboard = () => {
                           <p className="font-medium text-[#2C3E50]">
                             {user.first_name} {user.last_name}
                           </p>
+                          <p className="text-sm text-[#443f3f]">
+                            Last sign in: {user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : 'Never'}
+                          </p>
                         </div>
                       </div>
                     </td>
@@ -194,6 +230,13 @@ export const AdminDashboard = () => {
                       }`}>
                         {user.banned ? 'Banned' : 'Active'}
                       </span>
+                    </td>
+                    <td className="py-4 px-4">
+                      {user.is_online ? (
+                        <Wifi className="w-5 h-5 text-green-500" />
+                      ) : (
+                        <WifiOff className="w-5 h-5 text-gray-400" />
+                      )}
                     </td>
                     <td className="py-4 px-4">
                       <div className="flex justify-end gap-2">
