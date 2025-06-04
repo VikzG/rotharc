@@ -10,56 +10,65 @@ interface EnhancementModalProps {
   videoUrl: string;
 }
 
-export const EnhancementModal: React.FC<EnhancementModalProps> = ({
+export const EnhancementModal = ({
   isOpen,
   onClose,
   title,
   description,
-  videoUrl,
-}) => {
-  if (!isOpen) return null;
-
+  videoUrl
+}: EnhancementModalProps) => {
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
           onClick={onClose}
-        />
-        
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative z-50 w-full max-w-4xl bg-[#d9d9d9] rounded-[25px] overflow-hidden"
         >
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-[#d9d9d9] text-[#2C3E50] hover:text-[#2C8DB0] shadow-[5px_5px_13px_#a3a3a3e6,-5px_-5px_10px_#ffffffe6] hover:shadow-[0_0_20px_rgba(44,141,176,0.3)] transition-all duration-300 z-10"
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-4xl bg-[#222222] rounded-[25px] overflow-hidden"
+            style={{ height: '75vh' }} // Réduit à 75% de la hauteur de la fenêtre
           >
-            <X className="w-6 h-6" />
-          </button>
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black bg-opacity-50 text-white hover:bg-opacity-75 transition-all"
+            >
+              <X className="w-6 h-6" />
+            </button>
 
-          <div className="p-8">
-            <h2 className="text-3xl font-semibold mb-6 text-[#2C3E50] [font-family:'Montserrat_Alternates',Helvetica]">
-              {title}
-            </h2>
+            <div className="h-full flex flex-col">
+              <div className="relative h-1/2">
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover"
+                >
+                  <source src={videoUrl} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#222222] pointer-events-none" />
+              </div>
 
-            <div className="relative w-full h-[400px] rounded-[15px] overflow-hidden mb-6 shadow-[inset_5px_5px_13px_#a3a3a3e6,inset_-5px_-5px_10px_#ffffffe6]">
-<iframe width="100%" height="100%"
-src="https://www.youtube.com/watch?v=dIAA1zo3JR8">
-</iframe>
+              <div className="flex-1 p-8 overflow-y-auto">
+                <h2 className="text-3xl font-bold mb-4 text-white [font-family:'Montserrat_Alternates',Helvetica]">
+                  {title}
+                </h2>
+                <p className="text-gray-300 text-lg [font-family:'Montserrat_Alternates',Helvetica]">
+                  {description}
+                </p>
+              </div>
             </div>
-
-            <p className="text-lg text-[#443f3f] [font-family:'Montserrat_Alternates',Helvetica]">
-              {description}
-            </p>
-          </div>
+          </motion.div>
         </motion.div>
-      </div>
+      )}
     </AnimatePresence>
   );
 };
