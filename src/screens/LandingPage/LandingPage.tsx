@@ -171,7 +171,7 @@ export const LandingPage = () => {
           </motion.div>
         </div>
 
-        <section className="flex flex-col py-32 bg-[#f0eded]">
+        <section className="flex flex-col py-32 bg-[#d9d9d9]">
           <motion.h2
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -193,7 +193,7 @@ export const LandingPage = () => {
           </motion.p>
         </section>
 
-        <section className="px-8 bg-[#f0eded]">
+        <section className="px-8 bg-[#d9d9d9]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-[1173px] mx-auto">
             {enhancementCards.map((card, index) => (
               <motion.button

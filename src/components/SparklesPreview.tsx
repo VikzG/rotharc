@@ -9,7 +9,7 @@ export function SparklesPreview() {
         <h1 className="md:text-6xl top-[40%] absolute text-4xl lg:text-8xl font-bold text-center text-white animate-glow z-40 [font-family:'Mars',Helvetica]">
           Rotharc
         </h1>
-        <p className="top-[48%] md:top-1/2 absolute text-xl md:text-2xl lg:text-4xl text-white/80 [font-family:'Montserrat_Alternates',Helvetica] z-20">
+        <p className="top-[46%] md:top-1/2 absolute text-xl md:text-2xl lg:text-4xl text-white/80 [font-family:'Montserrat_Alternates',Helvetica] z-20">
           technologies
         </p>
         {/* Gradients */}
