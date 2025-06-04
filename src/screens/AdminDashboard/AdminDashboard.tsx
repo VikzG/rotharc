@@ -41,49 +41,20 @@ export const AdminDashboard = () => {
       if (!isAdmin) return;
 
       try {
-        // Récupérer tous les utilisateurs de auth
-        const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
-        
-        if (authError) {
-          throw authError;
-        }
-
-        // Récupérer tous les profils avec leur statut admin
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select(`
-            *,
-            admin_users (
-              is_super_admin
-            )
-          `);
-
-        if (profilesError) {
-          throw profilesError;
-        }
-
-        // Get presence data
-        const presenceData = await supabase.channel('online-users').presenceState();
-
-        // Combiner les données
-        const processedUsers = authData.users.map(authUser => {
-          const profile = profiles?.find(p => p.id === authUser.id) || {};
-          return {
-            id: authUser.id,
-            email: authUser.email,
-            first_name: profile.first_name || authUser.user_metadata?.first_name || '',
-            last_name: profile.last_name || authUser.user_metadata?.last_name || '',
-            avatar_url: profile.avatar_url,
-            admin_users: profile.admin_users,
-            is_online: Object.values(presenceData).some(
-              presence => presence.user_id === authUser.id
-            ),
-            banned: authUser.banned || false,
-            last_sign_in_at: authUser.last_sign_in_at,
-          };
+        const session = await supabase.auth.getSession();
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/list-all-users`, {
+          headers: {
+            'Authorization': `Bearer ${session.data.session?.access_token}`,
+          },
         });
 
-        setUsers(processedUsers);
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to fetch users');
+        }
+
+        const users = await response.json();
+        setUsers(users);
       } catch (error) {
         console.error('Error fetching users:', error);
         toast.error('Failed to fetch users');
@@ -122,9 +93,18 @@ export const AdminDashboard = () => {
       }
 
       toast.success('User banned successfully');
-      // Refresh user list
-      const { data: users } = await supabase.from('profiles').select('*');
-      if (users) setUsers(users);
+      // Refresh user list by calling fetchUsers again
+      const session = await supabase.auth.getSession();
+      const usersResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/list-all-users`, {
+        headers: {
+          'Authorization': `Bearer ${session.data.session?.access_token}`,
+        },
+      });
+      
+      if (usersResponse.ok) {
+        const updatedUsers = await usersResponse.json();
+        setUsers(updatedUsers);
+      }
     } catch (error) {
       console.error('Error banning user:', error);
       toast.error('Failed to ban user');
@@ -147,9 +127,18 @@ export const AdminDashboard = () => {
       }
 
       toast.success('User unbanned successfully');
-      // Refresh user list
-      const { data: users } = await supabase.from('profiles').select('*');
-      if (users) setUsers(users);
+      // Refresh user list by calling fetchUsers again
+      const session = await supabase.auth.getSession();
+      const usersResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/list-all-users`, {
+        headers: {
+          'Authorization': `Bearer ${session.data.session?.access_token}`,
+        },
+      });
+      
+      if (usersResponse.ok) {
+        const updatedUsers = await usersResponse.json();
+        setUsers(updatedUsers);
+      }
     } catch (error) {
       console.error('Error unbanning user:', error);
       toast.error('Failed to unban user');
